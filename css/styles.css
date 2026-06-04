@@ -210,6 +210,13 @@ main { flex: 1; padding: 16px 0 30px; }
 .ymap-pin.is-visited .ymap-pin__body { background: linear-gradient(135deg, #74e7bd, var(--ok)); }
 .ymap-pin.is-route .ymap-pin__body { box-shadow: 0 0 0 4px rgba(143,134,255,0.40), 0 7px 16px rgba(0,0,0,0.5); }
 
+/* бесплатная карта (Leaflet) — тёмный фон, прозрачные пины, аккуратный копирайт */
+.leaflet-barpin { background: transparent; border: none; }
+.leaflet-container { background: #0f0e16; font-family: inherit; }
+.leaflet-container a { color: var(--accent); }
+.leaflet-control-attribution { background: rgba(8,8,14,0.6) !important; color: var(--faint) !important; backdrop-filter: blur(6px); border-radius: 8px 0 0 0; font-size: 10px; padding: 2px 6px; }
+.leaflet-control-attribution a { color: var(--muted) !important; }
+
 /* ───────── СПИСОК БАРОВ (Оценки) ───────── */
 .bar-list { display: flex; flex-direction: column; gap: 11px; }
 .bar-card {

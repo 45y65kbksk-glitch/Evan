@@ -125,7 +125,7 @@ document.querySelectorAll(".tab").forEach((tab) =>
 );
 
 // ═════════════════════════ КАРТА (Яндекс.Карты v3) ═════════════════════════
-let map = null, mapInited = false, ymScriptPromise = null, markers = {}, currentZoom = CONFIG.MAP_ZOOM, mapWatchdog = null;
+let map = null, mapInited = false, ymScriptPromise = null, leafletPromise = null, markers = {}, currentZoom = CONFIG.MAP_ZOOM, mapWatchdog = null, usingLeaflet = false, routeLine = null;
 
 function loadYandex(key) {
   if (window.ymaps3) return Promise.resolve();
@@ -144,26 +144,96 @@ function loadYandex(key) {
 async function initMap() {
   if (mapInited) return;
   const overlay = $("#mapOverlay");
+  const provider = (CONFIG.MAP_PROVIDER || "osm").toLowerCase();
+
+  // Бесплатная карта без ключа (OpenStreetMap/CARTO)
+  if (provider !== "yandex") {
+    overlay.hidden = true;
+    clearTimeout(mapWatchdog);
+    mapWatchdog = setTimeout(() => { if (!mapInited) showMapOverlay("slow"); }, 8000);
+    try { await initOsm(); mapInited = true; clearTimeout(mapWatchdog); overlay.hidden = true; }
+    catch (e) { clearTimeout(mapWatchdog); console.error("[map osm]", e); showMapOverlay("error", e && e.message); }
+    return;
+  }
+
+  // Яндекс.Карты (нужен ключ + домен в кабинете)
   if (!CONFIG.YANDEX_API_KEY) { showMapOverlay("nokey"); return; }
   overlay.hidden = true;
-
-  // если карта не поднимется за 8 секунд — показываем диагностику
   clearTimeout(mapWatchdog);
   mapWatchdog = setTimeout(() => { if (!mapInited) showMapOverlay("slow"); }, 8000);
-
   try {
     await loadYandex(CONFIG.YANDEX_API_KEY);
     if (!window.ymaps3) throw new Error("ymaps3 не определён после загрузки скрипта");
     await ymaps3.ready;
-    buildMap();
-    mapInited = true;
-    clearTimeout(mapWatchdog);
-    overlay.hidden = true;
+    buildYandexMap();
+    mapInited = true; clearTimeout(mapWatchdog); overlay.hidden = true;
   } catch (e) {
     clearTimeout(mapWatchdog);
-    console.error("[map]", e);
-    showMapOverlay("error", e && e.message);
+    console.error("[map yandex]", e);
+    // авто-фолбэк на бесплатную карту, чтобы не остаться без карты
+    try { await initOsm(); mapInited = true; overlay.hidden = true; }
+    catch (e2) { console.error("[map osm fallback]", e2); showMapOverlay("error", (e && e.message) || (e2 && e2.message)); }
   }
+}
+
+// ── бесплатная карта (Leaflet + тёмные тайлы CARTO, без ключа) ──
+function loadLeaflet() {
+  if (window.L) return Promise.resolve();
+  if (leafletPromise) return leafletPromise;
+  leafletPromise = new Promise((resolve, reject) => {
+    if (!document.getElementById("leaflet-css")) {
+      const link = document.createElement("link");
+      link.id = "leaflet-css"; link.rel = "stylesheet";
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      document.head.appendChild(link);
+    }
+    const s = document.createElement("script");
+    s.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    s.async = true;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error("Не удалось загрузить карту (Leaflet)"));
+    document.head.appendChild(s);
+  });
+  return leafletPromise;
+}
+
+async function initOsm() {
+  await loadLeaflet();
+  if (!window.L) throw new Error("Leaflet не загрузился");
+  buildLeafletMap();
+  usingLeaflet = true;
+}
+
+function leafletIcon(bar, i) {
+  const st = barState(bar.id);
+  const cls = "ymap-pin" + (st.visited ? " is-visited" : "") + (inRoute(bar.id) ? " is-route" : "");
+  const inner = st.visited ? svg("check") : `<span>${i + 1}</span>`;
+  return L.divIcon({ className: "leaflet-barpin", html: `<div class="${cls}"><div class="ymap-pin__body">${inner}</div></div>`, iconSize: [0, 0], iconAnchor: [0, 0] });
+}
+
+function buildLeafletMap() {
+  const [lat, lng] = CONFIG.MAP_CENTER;
+  map = L.map($("#map"), { zoomControl: false }).setView([lat, lng], CONFIG.MAP_ZOOM);
+  currentZoom = CONFIG.MAP_ZOOM;
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    maxZoom: 20, subdomains: "abcd", attribution: "© OpenStreetMap · © CARTO",
+  }).addTo(map);
+  drawLeafletRouteLine();
+  BARS.forEach((bar, i) => {
+    const marker = L.marker([bar.coords[0], bar.coords[1]], { icon: leafletIcon(bar, i) }).addTo(map);
+    marker.on("click", () => openSheet(bar.id));
+    markers[bar.id] = { marker, i };
+  });
+  map.on("zoomend", () => { currentZoom = map.getZoom(); });
+  setTimeout(() => { try { map.invalidateSize(); } catch { /* ignore */ } }, 120);
+}
+
+function drawLeafletRouteLine() {
+  if (!map || !window.L) return;
+  if (routeLine) { try { map.removeLayer(routeLine); } catch { /* ignore */ } routeLine = null; }
+  if (state.route.length < 2) return;
+  const pts = state.route.map((r) => { const b = barById(r.id); return [b.coords[0], b.coords[1]]; });
+  routeLine = L.polyline(pts, { color: "#8f86ff", weight: 4, opacity: 0.7, dashArray: "6 8" }).addTo(map);
 }
 
 function pinEl(bar, i) {
@@ -175,7 +245,7 @@ function pinEl(bar, i) {
   return el;
 }
 
-function buildMap() {
+function buildYandexMap() {
   const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker, YMapFeature } = ymaps3;
   const [lat, lng] = CONFIG.MAP_CENTER;
 
@@ -210,6 +280,14 @@ function drawRouteLine(YMapFeature) {
 
 function refreshMarkers() {
   if (!mapInited) return;
+  if (usingLeaflet) {
+    BARS.forEach((bar, i) => {
+      const ref = markers[bar.id];
+      if (ref) ref.marker.setIcon(leafletIcon(bar, i));
+    });
+    drawLeafletRouteLine();
+    return;
+  }
   BARS.forEach((bar, i) => {
     const ref = markers[bar.id];
     if (!ref) return;
@@ -222,6 +300,7 @@ function refreshMarkers() {
 
 function setZoom(delta) {
   if (!map) return;
+  if (usingLeaflet) { try { map.setZoom(map.getZoom() + delta); } catch (e) { console.warn(e); } return; }
   currentZoom = Math.max(10, Math.min(19, currentZoom + delta));
   try {
     const center = map.center || [CONFIG.MAP_CENTER[1], CONFIG.MAP_CENTER[0]];
