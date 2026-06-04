@@ -15,17 +15,22 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 </head>
 <body>
-  <!-- ───────── СТАРТОВЫЙ ЭКРАН ───────── -->
+  <!-- ───────── ДОМАШНИЙ / СТАРТОВЫЙ ЭКРАН ───────── -->
   <section id="start" class="start">
     <div class="start__aurora"></div>
-    <div class="start__card glass">
-      <span class="brand-mark brand-mark--lg" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-8 8-8-8Z"/><path d="M12 13v6"/><path d="M8 19h8"/></svg>
+    <div class="start__inner">
+      <span class="start__kicker">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-8 8-8-8Z"/><path d="M12 13v6"/><path d="M8 19h8"/></svg>
+        </span>
+        Бар-крол · Китай-город
       </span>
-      <h1 class="start__title">Бар-крол</h1>
-      <p class="start__sub">Путеводитель по барам Китай-города.<br />Для своих. Только на сегодня.</p>
-      <button id="startBtn" class="btn btn--primary btn--lg">Начать</button>
-      <p class="start__hint">карта · маршрут с таймером · оценки · паспорт</p>
+      <h1 class="start__title">С возвращением!</h1>
+      <p class="start__sub">Продолжим вечер по барам Китай-города?</p>
+      <button id="startBtn" class="btn btn--primary btn--lg start__btn">
+        Начать
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
     </div>
   </section>
 
