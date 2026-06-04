@@ -1,6 +1,6 @@
 // Простой service worker: кэширует оболочку приложения,
 // чтобы интерфейс открывался офлайн. Тайлы карты требуют сети.
-const CACHE = "barcrawl-v2";
+const CACHE = "barcrawl-v3";
 const ASSETS = [
   "./",
   "./index.html",

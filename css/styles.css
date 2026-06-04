@@ -177,15 +177,19 @@ main { flex: 1; padding: 16px 0 30px; }
 .map-overlay {
   position: absolute; inset: 0; z-index: 5;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; gap: 14px; padding: 28px; border-radius: var(--radius);
-  background: linear-gradient(160deg, rgba(16,15,24,0.86), rgba(8,8,14,0.92));
+  text-align: center; gap: 13px; padding: 24px 22px; border-radius: var(--radius); overflow-y: auto;
+  background: linear-gradient(160deg, rgba(16,15,24,0.90), rgba(8,8,14,0.95));
   backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
 }
 .map-overlay[hidden] { display: none; }
 .map-overlay h3 { margin: 0; font-size: 18px; }
-.map-overlay p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; max-width: 320px; }
+.map-overlay p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; max-width: 340px; }
 .map-overlay code { background: rgba(255,255,255,0.10); padding: 2px 7px; border-radius: 7px; font-size: 12px; color: var(--accent); }
 .map-overlay__list { margin-top: 4px; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 340px; text-align: left; }
+.map-overlay__why { text-align: left; max-width: 360px; margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); line-height: 1.5; display: flex; flex-direction: column; gap: 7px; }
+.map-overlay__why b { color: var(--text); font-weight: 700; }
+.map-overlay__why code { color: var(--accent); }
+.map-overlay__detail { font-size: 12px; color: var(--faint); max-width: 360px; word-break: break-word; }
 
 .map-zoom { position: absolute; right: 12px; bottom: 16px; z-index: 6; display: flex; flex-direction: column; gap: 8px; }
 .map-zoom__btn { width: 44px; height: 44px; border-radius: 14px; color: var(--text); display: grid; place-items: center; cursor: pointer; }

@@ -125,7 +125,7 @@ document.querySelectorAll(".tab").forEach((tab) =>
 );
 
 // ═════════════════════════ КАРТА (Яндекс.Карты v3) ═════════════════════════
-let map = null, mapInited = false, ymScriptPromise = null, markers = {}, currentZoom = CONFIG.MAP_ZOOM;
+let map = null, mapInited = false, ymScriptPromise = null, markers = {}, currentZoom = CONFIG.MAP_ZOOM, mapWatchdog = null;
 
 function loadYandex(key) {
   if (window.ymaps3) return Promise.resolve();
@@ -146,14 +146,23 @@ async function initMap() {
   const overlay = $("#mapOverlay");
   if (!CONFIG.YANDEX_API_KEY) { showMapOverlay("nokey"); return; }
   overlay.hidden = true;
+
+  // если карта не поднимется за 8 секунд — показываем диагностику
+  clearTimeout(mapWatchdog);
+  mapWatchdog = setTimeout(() => { if (!mapInited) showMapOverlay("slow"); }, 8000);
+
   try {
     await loadYandex(CONFIG.YANDEX_API_KEY);
+    if (!window.ymaps3) throw new Error("ymaps3 не определён после загрузки скрипта");
     await ymaps3.ready;
     buildMap();
     mapInited = true;
+    clearTimeout(mapWatchdog);
+    overlay.hidden = true;
   } catch (e) {
-    console.error(e);
-    showMapOverlay("error");
+    clearTimeout(mapWatchdog);
+    console.error("[map]", e);
+    showMapOverlay("error", e && e.message);
   }
 }
 
@@ -170,7 +179,7 @@ function buildMap() {
   const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker, YMapFeature } = ymaps3;
   const [lat, lng] = CONFIG.MAP_CENTER;
 
-  map = new YMap($("#map"), { location: { center: [lng, lat], zoom: CONFIG.MAP_ZOOM }, theme: "dark" });
+  map = new YMap($("#map"), { location: { center: [lng, lat], zoom: CONFIG.MAP_ZOOM } });
   map.addChild(new YMapDefaultSchemeLayer({ theme: "dark" }));
   map.addChild(new YMapDefaultFeaturesLayer());
 
@@ -222,7 +231,7 @@ function setZoom(delta) {
 $("#zoomIn").addEventListener("click", () => setZoom(1));
 $("#zoomOut").addEventListener("click", () => setZoom(-1));
 
-function showMapOverlay(kind) {
+function showMapOverlay(kind, detail) {
   const overlay = $("#mapOverlay");
   const listHtml = `<div class="map-overlay__list">${BARS.map((b) =>
     `<a class="btn btn--nav" href="${navUrl(b)}" target="_blank" rel="noopener">${svg("location")} ${b.name}</a>`
@@ -238,8 +247,15 @@ function showMapOverlay(kind) {
   } else {
     overlay.innerHTML = `
       <span class="brand-mark">${svg("offline")}</span>
-      <h3>Карта не загрузилась</h3>
-      <p>Проверь интернет и правильность ключа в <code>js/config.js</code>.</p>
+      <h3>${kind === "slow" ? "Карта долго не отвечает" : "Карта не загрузилась"}</h3>
+      <ul class="map-overlay__why">
+        <li><b>Домен не добавлен в ключ.</b> В кабинете Яндекса в поле <b>HTTP Referer</b> добавь: <code>localhost</code>, <code>127.0.0.1</code> и адрес сайта (для GitHub Pages — <code>45y65kbksk-glitch.github.io</code>).</li>
+        <li><b>Ключ ещё активируется</b> — это до 15 минут после создания.</li>
+        <li><b>Открыта как файл.</b> Запусти через веб-сервер или по ссылке (не открывай index.html двойным кликом).</li>
+      </ul>
+      ${detail ? `<p class="map-overlay__detail">Детали: ${detail}</p>` : ""}
+      <button class="btn btn--glass" onclick="location.reload()">Обновить</button>
+      <p style="color:var(--faint)">Пока — список баров с маршрутом:</p>
       ${listHtml}`;
   }
   overlay.hidden = false;
