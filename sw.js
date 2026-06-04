@@ -1,10 +1,11 @@
 // Простой service worker: кэширует оболочку приложения,
 // чтобы интерфейс открывался офлайн. Тайлы карты требуют сети.
-const CACHE = "barcrawl-v1";
+const CACHE = "barcrawl-v2";
 const ASSETS = [
   "./",
   "./index.html",
   "./css/styles.css",
+  "./js/config.js",
   "./js/data.js",
   "./js/app.js",
   "./manifest.webmanifest",
@@ -23,11 +24,20 @@ self.addEventListener("activate", (e) => {
   );
 });
 
+// Стратегия «сеть прежде всего» для своих файлов: при наличии интернета
+// всегда берём свежую версию (важно, чтобы правки config.js/data.js
+// подхватывались сразу), а офлайн — отдаём из кэша.
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
-  // Карты/тайлы и сторонние CDN — всегда из сети
-  if (url.origin !== location.origin) return;
+  if (url.origin !== location.origin) return; // карты/тайлы и CDN — из сети
+  if (e.request.method !== "GET") return;
   e.respondWith(
-    caches.match(e.request).then((hit) => hit || fetch(e.request))
+    fetch(e.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
+        return res;
+      })
+      .catch(() => caches.match(e.request).then((hit) => hit || caches.match("./index.html")))
   );
 });

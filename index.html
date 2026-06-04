@@ -2,84 +2,125 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#1a1320" />
-  <title>Бар-крол по Китай-городу</title>
-  <meta name="description" content="Путеводитель-игра по барам Китай-города для тёплой компании." />
-
-  <!-- Leaflet (карта на бесплатном OpenStreetMap) -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#07070b" />
+  <title>Бар-крол · Китай-город</title>
+  <meta name="description" content="Путеводитель-игра по барам Китай-города для своих." />
 
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon.svg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar__title">
-      <span class="topbar__emoji">🍻</span>
-      <div>
-        <h1>Бар-крол</h1>
-        <p>Китай-город · для своих</p>
-      </div>
+  <!-- ───────── СТАРТОВЫЙ ЭКРАН ───────── -->
+  <section id="start" class="start">
+    <div class="start__aurora"></div>
+    <div class="start__card glass">
+      <div class="start__emoji">🍸</div>
+      <h1 class="start__title">Бар-крол</h1>
+      <p class="start__sub">Путеводитель по барам Китай-города.<br />Для своих. Только на сегодня.</p>
+      <button id="startBtn" class="btn btn--primary btn--lg">Начать</button>
+      <p class="start__hint">Карта · маршрут с таймером · оценки · паспорт</p>
     </div>
-    <div class="progress" id="progress" title="Сколько баров пройдено">
-      <span class="progress__count" id="progressCount">0/0</span>
-      <div class="progress__bar"><div class="progress__fill" id="progressFill"></div></div>
-    </div>
-  </header>
+  </section>
 
-  <nav class="tabs">
-    <button class="tab tab--active" data-view="list">📋 Маршрут</button>
-    <button class="tab" data-view="map">🗺️ Карта</button>
-    <button class="tab" data-view="passport">🎫 Паспорт</button>
-  </nav>
-
-  <main>
-    <!-- СПИСОК / МАРШРУТ -->
-    <section id="view-list" class="view view--active">
-      <div id="barList" class="bar-list"></div>
-    </section>
-
-    <!-- КАРТА -->
-    <section id="view-map" class="view">
-      <div id="map"></div>
-    </section>
-
-    <!-- ПАСПОРТ -->
-    <section id="view-passport" class="view">
-      <div class="passport">
-        <div class="passport__ring">
-          <span class="passport__big" id="passportBig">0</span>
-          <span class="passport__total" id="passportTotal">из 0</span>
+  <!-- ───────── ПРИЛОЖЕНИЕ ───────── -->
+  <div id="app" class="app" hidden>
+    <header class="topbar glass">
+      <div class="topbar__title">
+        <span class="topbar__emoji">🍸</span>
+        <div>
+          <h1>Бар-крол</h1>
+          <p>Китай-город · для своих</p>
         </div>
-        <p class="passport__caption" id="passportCaption"></p>
-        <div id="passportBadges" class="badges"></div>
-        <button id="resetBtn" class="btn btn--ghost">Сбросить прогресс</button>
       </div>
-    </section>
-  </main>
+      <div class="topbar__progress" id="progress" title="Сколько баров отмечено">
+        <span class="topbar__count" id="progressCount">0/0</span>
+        <div class="topbar__track"><div class="topbar__fill" id="progressFill"></div></div>
+      </div>
+    </header>
 
-  <!-- Модалка карточки бара -->
+    <nav class="tabs glass">
+      <button class="tab tab--active" data-view="map">🗺️ Карта</button>
+      <button class="tab" data-view="route">🧭 Маршрут</button>
+      <button class="tab" data-view="ratings">⭐ Оценки</button>
+      <button class="tab" data-view="passport">🎫 Паспорт</button>
+    </nav>
+
+    <main>
+      <!-- КАРТА -->
+      <section id="view-map" class="view view--active">
+        <div class="map-wrap">
+          <div id="map"></div>
+          <div id="mapOverlay" class="map-overlay" hidden></div>
+          <div class="map-zoom">
+            <button id="zoomIn" class="map-zoom__btn glass" aria-label="Приблизить">+</button>
+            <button id="zoomOut" class="map-zoom__btn glass" aria-label="Отдалить">−</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- МАРШРУТ + ТАЙМЕР -->
+      <section id="view-route" class="view">
+        <div id="timerPanel" class="timer glass" hidden></div>
+
+        <div class="route-block">
+          <div class="section-head">
+            <h2>Твой маршрут</h2>
+            <span class="section-head__hint" id="routeHint"></span>
+          </div>
+          <div id="routeList" class="route-list"></div>
+        </div>
+
+        <div class="route-block">
+          <div class="section-head"><h2>Добавить бар</h2></div>
+          <div id="routeAdd" class="route-add"></div>
+        </div>
+      </section>
+
+      <!-- МОИ ОЦЕНКИ -->
+      <section id="view-ratings" class="view">
+        <div class="section-head">
+          <h2>Мои оценки</h2>
+          <span class="section-head__hint" id="ratingsAvg"></span>
+        </div>
+        <div id="ratingsList" class="bar-list"></div>
+      </section>
+
+      <!-- ПАСПОРТ -->
+      <section id="view-passport" class="view">
+        <div class="passport glass">
+          <div class="passport__ring">
+            <span class="passport__big" id="passportBig">0</span>
+            <span class="passport__total" id="passportTotal">из 0</span>
+          </div>
+          <div class="passport__rank" id="passportRank">—</div>
+          <p class="passport__caption" id="passportCaption"></p>
+          <div class="passport__meter">
+            <span>Рейтинг</span>
+            <div class="passport__stars" id="passportStars"></div>
+          </div>
+          <div id="passportBadges" class="badges"></div>
+          <button id="resetBtn" class="btn btn--ghost">Сбросить прогресс</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ───────── КАРТОЧКА БАРА (нижний лист) ───────── -->
   <div id="modal" class="modal" hidden>
     <div class="modal__backdrop" data-close></div>
-    <div class="modal__card" role="dialog" aria-modal="true">
+    <div class="modal__card glass" role="dialog" aria-modal="true">
+      <div class="modal__grip" data-close></div>
       <button class="modal__close" data-close aria-label="Закрыть">✕</button>
       <div id="modalBody"></div>
     </div>
   </div>
 
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
+  <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
 </body>
