@@ -61,6 +61,7 @@ const ICONS = {
   route: '<circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h5a4 4 0 0 1 0 8h-3a4 4 0 0 0 0 4h6"/>',
   key: '<circle cx="8" cy="14" r="4"/><path d="M11 11l8-8M16 4l3 3M14.5 5.5l2.5 2.5"/>',
   offline: '<path d="M3 3l18 18M8.8 16.1a4.5 4.5 0 0 1 6.4 0M5 12.5a11 11 0 0 1 3.5-2.3M19 12.5a11 11 0 0 0-4-2.6M2 8.8A16 16 0 0 1 7 6M22 8.8a16 16 0 0 0-6-3M12 20h.01"/>',
+  comment: '<path d="M20 11.5a7.5 7.5 0 0 1-10.9 6.7L4 19.5l1.3-4.2A7.5 7.5 0 1 1 20 11.5Z"/>',
 };
 function svg(name) {
   return `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ""}</svg>`;
@@ -224,6 +225,13 @@ function buildLeafletMap() {
     marker.on("click", () => openSheet(bar.id));
     markers[bar.id] = { marker, i };
   });
+  // центрируем карту на барах
+  if (BARS.length === 1) {
+    map.setView(BARS[0].coords, CONFIG.MAP_ZOOM);
+  } else if (BARS.length >= 2) {
+    try { map.fitBounds(L.featureGroup(Object.values(markers).map((m) => m.marker)).getBounds().pad(0.3)); } catch { /* ignore */ }
+  }
+  currentZoom = map.getZoom();
   map.on("zoomend", () => { currentZoom = map.getZoom(); });
   setTimeout(() => { try { map.invalidateSize(); } catch { /* ignore */ } }, 120);
 }
@@ -358,6 +366,12 @@ function openSheet(id) {
 
   const toast = bar.toast ? `<p class="toast">${bar.toast}</p>` : "";
 
+  const noteBlock = bar.note
+    ? `<div class="sheet__block">
+         <div class="sheet__label">${svg("comment")} Комментарий редакции</div>
+         <div class="sheet__note"><p>${bar.note}</p></div>
+       </div>` : "";
+
   body.innerHTML = `
     ${photo}
     <div class="sheet__head">
@@ -387,6 +401,8 @@ function openSheet(id) {
         ${toast}
       </div>
     </div>
+
+    ${noteBlock}
 
     <div class="sheet__block">
       <div class="sheet__label">${svg("star")} Твоя оценка</div>

@@ -344,6 +344,8 @@ main { flex: 1; padding: 16px 0 30px; }
 .sheet__quest { background: linear-gradient(135deg, rgba(143,134,255,0.14), rgba(255,148,102,0.10)); border: 1px solid var(--glass-border); border-radius: 16px; padding: 14px; }
 .sheet__quest p { margin: 0; font-size: 14px; line-height: 1.55; }
 .sheet__quest .toast { margin-top: 10px; color: var(--gold); font-style: italic; }
+.sheet__note { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-left: 3px solid var(--accent); border-radius: 14px; padding: 13px 14px; }
+.sheet__note p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--text); }
 
 /* рейтинг (звёзды в карточке) */
 .rating { display: flex; align-items: center; gap: 4px; }
