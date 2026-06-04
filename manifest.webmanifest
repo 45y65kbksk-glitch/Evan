@@ -1,0 +1,19 @@
+{
+  "name": "Бар-крол по Китай-городу",
+  "short_name": "Бар-крол",
+  "description": "Путеводитель-игра по барам Китай-города для тёплой компании.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a1320",
+  "theme_color": "#1a1320",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
