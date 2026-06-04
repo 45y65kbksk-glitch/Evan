@@ -22,7 +22,6 @@ function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 let state = loadState();
 
 // чистим маршрут/таймер от баров, которых больше нет в данных
-// (важно, когда заглушки заменят на реальные бары с другими id)
 (function sanitizeState() {
   const ids = new Set(BARS.map((b) => b.id));
   const before = JSON.stringify(state);
@@ -38,6 +37,34 @@ const barState = (id) => state.bars[id] || { rating: 0, visited: false };
 const visitedCount = () => BARS.filter((b) => barState(b.id).visited).length;
 const inRoute = (id) => state.route.some((r) => r.id === id);
 const stars = (n) => "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n);
+const monogram = (name) => (name || "?").trim().charAt(0).toUpperCase();
+
+// ── иконки (тонкие линейные SVG, без эмодзи) ──
+const ICONS = {
+  check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
+  location: '<path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  minus: '<path d="M5 12h14"/>',
+  play: '<path d="M8 5v14l11-7-11-7Z"/>',
+  pause: '<path d="M9 5v14M15 5v14"/>',
+  next: '<path d="M7 5v14l9-7-9-7Z"/><path d="M18 5v14"/>',
+  stop: '<rect x="7" y="7" width="10" height="10" rx="2"/>',
+  chevron: '<path d="M9 6l6 6-6 6"/>',
+  up: '<path d="M12 19V5M6 11l6-6 6 6"/>',
+  down: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+  trash: '<path d="M5 7h14M10 7V5h4v2M7 7l.8 12h8.4L17 7"/>',
+  good: '<circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
+  ban: '<circle cx="12" cy="12" r="8.5"/><path d="M6.5 6.5l11 11"/>',
+  target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/>',
+  info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/>',
+  star: '<path d="M12 4l2.3 4.7 5.2.75-3.75 3.66.9 5.15L12 15.9 7.35 18.4l.9-5.15L4.5 9.45l5.2-.75L12 4Z"/>',
+  route: '<circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h5a4 4 0 0 1 0 8h-3a4 4 0 0 0 0 4h6"/>',
+  key: '<circle cx="8" cy="14" r="4"/><path d="M11 11l8-8M16 4l3 3M14.5 5.5l2.5 2.5"/>',
+  offline: '<path d="M3 3l18 18M8.8 16.1a4.5 4.5 0 0 1 6.4 0M5 12.5a11 11 0 0 1 3.5-2.3M19 12.5a11 11 0 0 0-4-2.6M2 8.8A16 16 0 0 1 7 6M22 8.8a16 16 0 0 0-6-3M12 20h.01"/>',
+};
+function svg(name) {
+  return `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ""}</svg>`;
+}
 
 function setBar(id, patch) {
   state.bars[id] = { ...barState(id), ...patch };
@@ -134,7 +161,7 @@ function pinEl(bar, i) {
   const st = barState(bar.id);
   const el = document.createElement("div");
   el.className = "ymap-pin" + (st.visited ? " is-visited" : "") + (inRoute(bar.id) ? " is-route" : "");
-  el.innerHTML = `<div class="ymap-pin__body"><span>${st.visited ? "✓" : i + 1}</span></div>`;
+  el.innerHTML = `<div class="ymap-pin__body">${st.visited ? svg("check") : `<span>${i + 1}</span>`}</div>`;
   el.addEventListener("click", () => openSheet(bar.id));
   return el;
 }
@@ -147,7 +174,6 @@ function buildMap() {
   map.addChild(new YMapDefaultSchemeLayer({ theme: "dark" }));
   map.addChild(new YMapDefaultFeaturesLayer());
 
-  // линия маршрута (если в маршруте 2+ бара)
   drawRouteLine(YMapFeature);
 
   BARS.forEach((bar, i) => {
@@ -168,7 +194,7 @@ function drawRouteLine(YMapFeature) {
   const coords = state.route.map((r) => { const b = barById(r.id); return [b.coords[1], b.coords[0]]; });
   routeLineFeature = new YMapFeature({
     geometry: { type: "LineString", coordinates: coords },
-    style: { stroke: [{ color: "#8b7bff", width: 4, dash: [6, 8] }] },
+    style: { stroke: [{ color: "#8f86ff", width: 4, dash: [6, 8] }] },
   });
   map.addChild(routeLineFeature);
 }
@@ -180,7 +206,7 @@ function refreshMarkers() {
     if (!ref) return;
     const st = barState(bar.id);
     ref.el.className = "ymap-pin" + (st.visited ? " is-visited" : "") + (inRoute(bar.id) ? " is-route" : "");
-    ref.el.querySelector("span").textContent = st.visited ? "✓" : i + 1;
+    ref.el.querySelector(".ymap-pin__body").innerHTML = st.visited ? svg("check") : `<span>${i + 1}</span>`;
   });
   drawRouteLine();
 }
@@ -199,18 +225,20 @@ $("#zoomOut").addEventListener("click", () => setZoom(-1));
 function showMapOverlay(kind) {
   const overlay = $("#mapOverlay");
   const listHtml = `<div class="map-overlay__list">${BARS.map((b) =>
-    `<a class="btn btn--nav" href="${navUrl(b)}" target="_blank" rel="noopener">${b.emoji} ${b.name}</a>`
+    `<a class="btn btn--nav" href="${navUrl(b)}" target="_blank" rel="noopener">${svg("location")} ${b.name}</a>`
   ).join("")}</div>`;
 
   if (kind === "nokey") {
     overlay.innerHTML = `
-      <h3>🔑 Нужен ключ Яндекс.Карт</h3>
+      <span class="brand-mark">${svg("key")}</span>
+      <h3>Нужен ключ Яндекс.Карт</h3>
       <p>Вставь бесплатный ключ в <code>js/config.js</code> (поле <code>YANDEX_API_KEY</code>) — инструкция там же. Карта появится автоматически.</p>
       <p style="color:var(--faint)">А пока — список баров с маршрутом в Яндекс.Картах:</p>
       ${listHtml}`;
   } else {
     overlay.innerHTML = `
-      <h3>🌐 Карта не загрузилась</h3>
+      <span class="brand-mark">${svg("offline")}</span>
+      <h3>Карта не загрузилась</h3>
       <p>Проверь интернет и правильность ключа в <code>js/config.js</code>.</p>
       ${listHtml}`;
   }
@@ -225,20 +253,20 @@ function openSheet(id) {
 
   const photo = bar.photo
     ? `<div class="sheet__photo"><img src="${bar.photo}" alt="${bar.name}" loading="lazy" /></div>`
-    : `<div class="sheet__photo"><span class="sheet__photo-emoji">${bar.emoji}</span></div>`;
+    : `<div class="sheet__photo"><span class="sheet__photo-mono">${monogram(bar.name)}</span></div>`;
 
   const avoidBlock = (bar.avoid && bar.avoid.length)
     ? `<div class="sheet__block">
-         <div class="sheet__label is-bad">⚠️ Что не стоит брать</div>
+         <div class="sheet__label is-bad">${svg("ban")} Что не стоит брать</div>
          <ul class="sheet__order is-bad">${bar.avoid.map((o) => `<li>${o}</li>`).join("")}</ul>
        </div>` : "";
 
-  const toast = bar.toast ? `<p class="toast">🥂 ${bar.toast}</p>` : "";
+  const toast = bar.toast ? `<p class="toast">${bar.toast}</p>` : "";
 
   body.innerHTML = `
     ${photo}
     <div class="sheet__head">
-      <span class="sheet__emoji">${bar.emoji}</span>
+      <span class="sheet__mono">${monogram(bar.name)}</span>
       <div>
         <h2 class="sheet__name">${bar.name}</h2>
         <p class="sheet__street">${bar.street}</p>
@@ -246,19 +274,19 @@ function openSheet(id) {
     </div>
 
     <div class="sheet__block">
-      <div class="sheet__label">Зачем сюда идти</div>
+      <div class="sheet__label">${svg("info")} Зачем сюда идти</div>
       <p class="sheet__feature">${bar.feature}</p>
     </div>
 
     <div class="sheet__block">
-      <div class="sheet__label is-good">🍸 Что заказать</div>
+      <div class="sheet__label is-good">${svg("good")} Что заказать</div>
       <ul class="sheet__order">${bar.order.map((o) => `<li>${o}</li>`).join("")}</ul>
     </div>
 
     ${avoidBlock}
 
     <div class="sheet__block">
-      <div class="sheet__label is-quest">🎯 Квест от автора</div>
+      <div class="sheet__label is-quest">${svg("target")} Квест от автора</div>
       <div class="sheet__quest">
         <p>${bar.quest}</p>
         ${toast}
@@ -266,7 +294,7 @@ function openSheet(id) {
     </div>
 
     <div class="sheet__block">
-      <div class="sheet__label">Твоя оценка</div>
+      <div class="sheet__label">${svg("star")} Твоя оценка</div>
       <div class="rating" id="rating">
         ${[1, 2, 3, 4, 5].map((n) => `<span class="rating__star ${n <= st.rating ? "on" : ""}" data-n="${n}">★</span>`).join("")}
         <span class="rating__hint" id="ratingHint">${st.rating ? st.rating + "/5" : "поставь звёзды"}</span>
@@ -274,13 +302,13 @@ function openSheet(id) {
     </div>
 
     <button class="btn ${st.visited ? "btn--visited" : "btn--primary"}" id="visitBtn">
-      ${st.visited ? "✓ Были тут" : "Отметить, что были тут"}
+      ${st.visited ? svg("check") + " Были тут" : "Отметить, что были тут"}
     </button>
     <div class="btn-row">
       <button class="btn ${inRoute(id) ? "btn--glass" : "btn--cool"}" id="routeBtn">
-        ${inRoute(id) ? "− Убрать из маршрута" : "+ В маршрут"}
+        ${inRoute(id) ? svg("minus") + " Убрать из маршрута" : svg("plus") + " В маршрут"}
       </button>
-      <a class="btn btn--nav" href="${navUrl(bar)}" target="_blank" rel="noopener">📍 Маршрут</a>
+      <a class="btn btn--nav" href="${navUrl(bar)}" target="_blank" rel="noopener">${svg("location")} Маршрут</a>
     </div>
   `;
 
@@ -295,14 +323,12 @@ function openSheet(id) {
     });
   });
 
-  // были тут
   $("#visitBtn").addEventListener("click", () => {
     setBar(id, { visited: !barState(id).visited });
     openSheet(id);
     renderProgress(); renderRatings(); renderRoute(); refreshMarkers();
   });
 
-  // в маршрут / из маршрута
   $("#routeBtn").addEventListener("click", () => {
     toggleRoute(id);
     openSheet(id);
@@ -314,7 +340,7 @@ function openSheet(id) {
 function closeModal() { $("#modal").hidden = true; }
 document.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", closeModal));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
-window.openSheet = openSheet; // на всякий случай для внешних ссылок
+window.openSheet = openSheet;
 
 // ═════════════════════════ МАРШРУТ + ТАЙМЕР ═════════════════════════
 function toggleRoute(id) {
@@ -344,7 +370,7 @@ function renderRoute() {
   const list = $("#routeList");
   const hint = $("#routeHint");
   if (!state.route.length) {
-    list.innerHTML = `<div class="empty"><span class="empty__emoji">🧭</span>Маршрут пуст. Добавь бары ниже или из карточки бара — собери план на вечер и поставь таймер на каждую точку.</div>`;
+    list.innerHTML = `<div class="empty"><span class="empty__ic">${svg("route")}</span>Маршрут пуст. Добавь бары ниже или из карточки бара — собери план на вечер и поставь таймер на каждую точку.</div>`;
     hint.textContent = "";
   } else {
     const totalMin = state.route.reduce((s, r) => s + (r.min || 0), 0);
@@ -358,17 +384,17 @@ function renderRoute() {
       item.innerHTML = `
         <div class="route-item__idx">${idx + 1}</div>
         <div class="route-item__main">
-          <div class="route-item__name">${bar.emoji} ${bar.name}</div>
+          <div class="route-item__name">${bar.name}</div>
           <div class="route-item__min">
             <input type="number" min="5" max="600" step="5" value="${r.min}" inputmode="numeric" aria-label="минут в баре" />
             <label>мин</label>
           </div>
         </div>
         <div class="route-item__acts">
-          <button class="icon-btn" data-act="up" ${idx === 0 ? "disabled" : ""} aria-label="Выше">↑</button>
-          <button class="icon-btn" data-act="down" ${idx === state.route.length - 1 ? "disabled" : ""} aria-label="Ниже">↓</button>
-          <button class="icon-btn icon-btn--go" data-act="go" aria-label="Запустить таймер">▶</button>
-          <button class="icon-btn icon-btn--del" data-act="del" aria-label="Убрать">✕</button>
+          <button class="icon-btn" data-act="up" ${idx === 0 ? "disabled" : ""} aria-label="Выше">${svg("up")}</button>
+          <button class="icon-btn" data-act="down" ${idx === state.route.length - 1 ? "disabled" : ""} aria-label="Ниже">${svg("down")}</button>
+          <button class="icon-btn icon-btn--go" data-act="go" aria-label="Запустить таймер">${svg("play")}</button>
+          <button class="icon-btn icon-btn--del" data-act="del" aria-label="Убрать">${svg("trash")}</button>
         </div>`;
       $("input", item).addEventListener("change", (e) => setRouteMin(r.id, parseInt(e.target.value, 10)));
       $('[data-act="up"]', item).addEventListener("click", () => moveRoute(r.id, -1));
@@ -379,12 +405,11 @@ function renderRoute() {
     });
   }
 
-  // добавить бар
   const add = $("#routeAdd");
   const rest = BARS.filter((b) => !inRoute(b.id));
   add.innerHTML = rest.length
-    ? rest.map((b) => `<button class="chip" data-id="${b.id}">${b.emoji} ${b.name} +</button>`).join("")
-    : `<span class="section-head__hint">Все бары уже в маршруте 🎉</span>`;
+    ? rest.map((b) => `<button class="chip" data-id="${b.id}">${svg("plus")}<span>${b.name}</span></button>`).join("")
+    : `<span class="section-head__hint">Все бары уже в маршруте</span>`;
   add.querySelectorAll(".chip").forEach((chip) =>
     chip.addEventListener("click", () => toggleRoute(chip.dataset.id))
   );
@@ -469,19 +494,19 @@ function renderTimerPanel() {
   panel.classList.toggle("is-done", !!done);
 
   panel.innerHTML = `
-    <div class="timer__label">${done ? "Время вышло!" : "Сейчас в баре"}</div>
-    <div class="timer__bar">${bar.emoji} ${bar.name}</div>
+    <div class="timer__label">${done ? "Время вышло" : "Сейчас в баре"}</div>
+    <div class="timer__bar">${bar.name}</div>
     <div class="timer__time">${done ? "00:00" : fmt(timerLeft())}</div>
     <div class="timer__ctrls">
       ${done
-        ? `<button class="btn btn--cool" data-t="next">Следующий бар →</button>
+        ? `<button class="btn btn--cool" data-t="next">${svg("next")} Следующий бар</button>
            <button class="btn btn--glass" data-t="add5">+5 мин</button>
            <button class="btn btn--ghost" data-t="stop">Стоп</button>`
-        : `<button class="btn btn--glass" data-t="${state.timer.paused ? "resume" : "pause"}">${state.timer.paused ? "▶ Продолжить" : "⏸ Пауза"}</button>
+        : `<button class="btn btn--glass" data-t="${state.timer.paused ? "resume" : "pause"}">${state.timer.paused ? svg("play") + " Продолжить" : svg("pause") + " Пауза"}</button>
            <button class="btn btn--glass" data-t="add5">+5 мин</button>
-           <button class="btn btn--cool" data-t="next">→</button>`}
+           <button class="btn btn--cool" data-t="next" aria-label="Следующий бар">${svg("next")}</button>`}
     </div>
-    ${done ? `<button class="btn btn--visited" data-t="visit" style="margin-top:10px">✓ Отметить, что были тут</button>` : ""}
+    ${done ? `<button class="btn btn--visited" data-t="visit" style="margin-top:10px">${svg("check")} Отметить, что были тут</button>` : ""}
   `;
 
   const actions = { pause: pauseTimer, resume: resumeTimer, add5: () => addTime(5), next: nextBar, stop: stopTimer };
@@ -505,10 +530,10 @@ function renderRatings() {
   const avg = rated.length
     ? (rated.reduce((s, b) => s + barState(b.id).rating, 0) / rated.length).toFixed(1)
     : null;
-  $("#ratingsAvg").textContent = avg ? `средняя ${avg} ★ · ${rated.length}` : "";
+  $("#ratingsAvg").textContent = avg ? `средняя ${avg} · ${rated.length}` : "";
 
   if (!rated.length) {
-    wrap.innerHTML = `<div class="empty"><span class="empty__emoji">⭐</span>Пока нет оценок. Открой бар на карте и поставь ему звёзды — он появится здесь.</div>`;
+    wrap.innerHTML = `<div class="empty"><span class="empty__ic">${svg("star")}</span>Пока нет оценок. Открой бар на карте и поставь ему звёзды — он появится здесь.</div>`;
     return;
   }
   wrap.innerHTML = "";
@@ -519,11 +544,11 @@ function renderRatings() {
     card.innerHTML = `
       <div class="bar-card__num">${st.rating}</div>
       <div class="bar-card__main">
-        <div class="bar-card__name">${bar.emoji} ${bar.name}</div>
+        <div class="bar-card__name">${bar.name}</div>
         <div class="bar-card__street">${bar.street}</div>
         <div class="bar-card__stars">${stars(st.rating)}</div>
       </div>
-      <div class="bar-card__chev">›</div>`;
+      <div class="bar-card__chev">${svg("chevron")}</div>`;
     card.addEventListener("click", () => openSheet(bar.id));
     wrap.appendChild(card);
   });
@@ -531,15 +556,15 @@ function renderRatings() {
 
 // ═════════════════════════ ПАСПОРТ ═════════════════════════
 const BADGES = [
-  { need: 1, label: "🍺 Первый бар" },
-  { need: 3, label: "🔥 В деле" },
-  { need: 5, label: "⭐ Половина пути" },
-  { need: 8, label: "🚀 Марафонец" },
-  { need: 10, label: "👑 Король Китай-города" },
+  { need: 1, label: "Первый бар" },
+  { need: 3, label: "В деле" },
+  { need: 5, label: "Половина пути" },
+  { need: 8, label: "Марафонец" },
+  { need: 10, label: "Король Китай-города" },
 ];
 
 function rankFor(done, total) {
-  if (done >= total && total > 0) return { title: "👑 Легенда Китай-города", caption: "Весь маршрут пройден. Ты — легенда этого вечера!" };
+  if (done >= total && total > 0) return { title: "Легенда Китай-города", caption: "Весь маршрут пройден. Ты — легенда этого вечера!" };
   const ranks = [
     { n: 0, title: "Трезвенник-теоретик", caption: "Маршрут ещё не начат. Отметь первый бар!" },
     { n: 1, title: "Робкий новичок", caption: "Первый бар взят — лиха беда начало." },
@@ -589,7 +614,6 @@ $("#resetBtn").addEventListener("click", () => {
 
 // ═════════════════════════ СТАРТ ═════════════════════════
 renderProgress();
-// если таймер был активен до перезагрузки — продолжаем отсчёт
 if (state.timer && !state.timer.paused && !state.timer.done) {
   if (timerLeft() <= 0) { state.timer.done = true; state.timer.paused = true; state.timer.leftMs = 0; saveState(); }
   else startTicking();

@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no" />
-  <meta name="theme-color" content="#07070b" />
+  <meta name="theme-color" content="#070709" />
   <title>Бар-крол · Китай-город</title>
-  <meta name="description" content="Путеводитель-игра по барам Китай-города для своих." />
+  <meta name="description" content="Путеводитель по барам Китай-города. Для своих." />
 
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -19,11 +19,13 @@
   <section id="start" class="start">
     <div class="start__aurora"></div>
     <div class="start__card glass">
-      <div class="start__emoji">🍸</div>
+      <span class="brand-mark brand-mark--lg" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-8 8-8-8Z"/><path d="M12 13v6"/><path d="M8 19h8"/></svg>
+      </span>
       <h1 class="start__title">Бар-крол</h1>
       <p class="start__sub">Путеводитель по барам Китай-города.<br />Для своих. Только на сегодня.</p>
       <button id="startBtn" class="btn btn--primary btn--lg">Начать</button>
-      <p class="start__hint">Карта · маршрут с таймером · оценки · паспорт</p>
+      <p class="start__hint">карта · маршрут с таймером · оценки · паспорт</p>
     </div>
   </section>
 
@@ -31,7 +33,9 @@
   <div id="app" class="app" hidden>
     <header class="topbar glass">
       <div class="topbar__title">
-        <span class="topbar__emoji">🍸</span>
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-8 8-8-8Z"/><path d="M12 13v6"/><path d="M8 19h8"/></svg>
+        </span>
         <div>
           <h1>Бар-крол</h1>
           <p>Китай-город · для своих</p>
@@ -44,10 +48,22 @@
     </header>
 
     <nav class="tabs glass">
-      <button class="tab tab--active" data-view="map">🗺️ Карта</button>
-      <button class="tab" data-view="route">🧭 Маршрут</button>
-      <button class="tab" data-view="ratings">⭐ Оценки</button>
-      <button class="tab" data-view="passport">🎫 Паспорт</button>
+      <button class="tab tab--active" data-view="map">
+        <span class="tab__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3.5 6v13.5L9 17.5l6 2 5.5-2V3.5L15 5.5 9 3.5Z"/><path d="M9 4v13.5M15 5.5V19"/></svg></span>
+        <span class="tab__lbl">Карта</span>
+      </button>
+      <button class="tab" data-view="route">
+        <span class="tab__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h5a4 4 0 0 1 0 8h-3a4 4 0 0 0 0 4h6"/></svg></span>
+        <span class="tab__lbl">Маршрут</span>
+      </button>
+      <button class="tab" data-view="ratings">
+        <span class="tab__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.55 5.17 5.7.83-4.12 4.02.97 5.68L12 16.9l-5.1 2.3.97-5.68L3.75 9.5l5.7-.83L12 3.5Z"/></svg></span>
+        <span class="tab__lbl">Оценки</span>
+      </button>
+      <button class="tab" data-view="passport">
+        <span class="tab__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><circle cx="9" cy="11" r="1.8"/><path d="M6.2 15.6c.5-1.2 1.5-1.9 2.8-1.9s2.3.7 2.8 1.9"/><path d="M14.5 10.5h3.5M14.5 13.5h3.5"/></svg></span>
+        <span class="tab__lbl">Паспорт</span>
+      </button>
     </nav>
 
     <main>
@@ -57,8 +73,12 @@
           <div id="map"></div>
           <div id="mapOverlay" class="map-overlay" hidden></div>
           <div class="map-zoom">
-            <button id="zoomIn" class="map-zoom__btn glass" aria-label="Приблизить">+</button>
-            <button id="zoomOut" class="map-zoom__btn glass" aria-label="Отдалить">−</button>
+            <button id="zoomIn" class="map-zoom__btn glass" aria-label="Приблизить">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+            <button id="zoomOut" class="map-zoom__btn glass" aria-label="Отдалить">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"/></svg>
+            </button>
           </div>
         </div>
       </section>
@@ -115,7 +135,9 @@
     <div class="modal__backdrop" data-close></div>
     <div class="modal__card glass" role="dialog" aria-modal="true">
       <div class="modal__grip" data-close></div>
-      <button class="modal__close" data-close aria-label="Закрыть">✕</button>
+      <button class="modal__close" data-close aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
       <div id="modalBody"></div>
     </div>
   </div>

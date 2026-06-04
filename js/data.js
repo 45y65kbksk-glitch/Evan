@@ -5,7 +5,6 @@
 //  Когда пришлёшь свои бары — заменим этот массив. Поля карточки:
 //    id        — короткий латиницей, уникальный (для хранения оценок)
 //    name      — название бара
-//    emoji     — иконка для пина и карточки
 //    street    — адрес
 //    coords    — [широта, долгота]  (порядок именно такой!)
 //    photo     — путь/URL фото или "" (пока пусто, добавим позже)
@@ -20,7 +19,6 @@ const BARS = [
   {
     id: "maroseyka",
     name: "Маросейка 14",
-    emoji: "🍺",
     street: "ул. Маросейка, 14",
     coords: [55.7574, 37.6363],
     photo: "",
@@ -33,7 +31,6 @@ const BARS = [
   {
     id: "pokrovka",
     name: "Погреб на Покровке",
-    emoji: "🍷",
     street: "ул. Покровка, 27",
     coords: [55.7596, 37.6469],
     photo: "",
@@ -46,7 +43,6 @@ const BARS = [
   {
     id: "nikolskaya",
     name: "Никольская Стойка",
-    emoji: "🥃",
     street: "ул. Никольская, 10",
     coords: [55.7570, 37.6231],
     photo: "",
@@ -59,7 +55,6 @@ const BARS = [
   {
     id: "solyanka",
     name: "Солянка Спешит",
-    emoji: "🍸",
     street: "ул. Солянка, 1/2",
     coords: [55.7536, 37.6378],
     photo: "",
@@ -72,7 +67,6 @@ const BARS = [
   {
     id: "hohlovsky",
     name: "Хохловка",
-    emoji: "🍻",
     street: "Хохловский пер., 7",
     coords: [55.7561, 37.6432],
     photo: "",
@@ -85,7 +79,6 @@ const BARS = [
   {
     id: "armyansky",
     name: "Армянский 13",
-    emoji: "🍶",
     street: "Армянский пер., 13",
     coords: [55.7588, 37.6361],
     photo: "",
@@ -98,7 +91,6 @@ const BARS = [
   {
     id: "zabelina",
     name: "Забелина Андеграунд",
-    emoji: "🎸",
     street: "ул. Забелина, 1",
     coords: [55.7548, 37.6360],
     photo: "",
@@ -111,7 +103,6 @@ const BARS = [
   {
     id: "starosadsky",
     name: "Старосадский Тихий",
-    emoji: "🍹",
     street: "Старосадский пер., 5",
     coords: [55.7580, 37.6398],
     photo: "",
@@ -124,7 +115,6 @@ const BARS = [
   {
     id: "lubyansky",
     name: "Лубянский Проезд",
-    emoji: "🍺",
     street: "Лубянский пр., 25",
     coords: [55.7558, 37.6300],
     photo: "",
@@ -137,7 +127,6 @@ const BARS = [
   {
     id: "varvarka",
     name: "Варварка Финал",
-    emoji: "🥂",
     street: "ул. Варварка, 6",
     coords: [55.7521, 37.6271],
     photo: "",
