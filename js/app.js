@@ -358,19 +358,43 @@ function openSheet(id) {
     ? `<div class="sheet__photo"><img src="${bar.photo}" alt="${bar.name}" loading="lazy" /></div>`
     : `<div class="sheet__photo"><span class="sheet__photo-mono">${monogram(bar.name)}</span></div>`;
 
+  const toast = bar.toast ? `<p class="toast">${bar.toast}</p>` : "";
+
+  const featureBlock = bar.feature
+    ? `<div class="sheet__block">
+         <div class="sheet__label">${svg("info")} Зачем сюда идти</div>
+         <p class="sheet__feature">${bar.feature}</p>
+       </div>` : "";
+
+  const orderBlock = (bar.order && bar.order.length)
+    ? `<div class="sheet__block">
+         <div class="sheet__label is-good">${svg("good")} Что заказать</div>
+         <ul class="sheet__order">${bar.order.map((o) => `<li>${o}</li>`).join("")}</ul>
+       </div>` : "";
+
   const avoidBlock = (bar.avoid && bar.avoid.length)
     ? `<div class="sheet__block">
          <div class="sheet__label is-bad">${svg("ban")} Что не стоит брать</div>
          <ul class="sheet__order is-bad">${bar.avoid.map((o) => `<li>${o}</li>`).join("")}</ul>
        </div>` : "";
 
-  const toast = bar.toast ? `<p class="toast">${bar.toast}</p>` : "";
+  const questBlock = bar.quest
+    ? `<div class="sheet__block">
+         <div class="sheet__label is-quest">${svg("target")} Квест от автора</div>
+         <div class="sheet__quest">
+           <p>${bar.quest}</p>
+           ${toast}
+         </div>
+       </div>` : "";
 
   const noteBlock = bar.note
     ? `<div class="sheet__block">
          <div class="sheet__label">${svg("comment")} Комментарий редакции</div>
          <div class="sheet__note"><p>${bar.note}</p></div>
        </div>` : "";
+
+  const hasContent = bar.feature || (bar.order && bar.order.length) || (bar.avoid && bar.avoid.length) || bar.quest || bar.note;
+  const emptyHint = hasContent ? "" : `<div class="sheet__block"><p class="sheet__feature" style="color:var(--muted)">Описание, рекомендации и квест добавим позже.</p></div>`;
 
   body.innerHTML = `
     ${photo}
@@ -382,27 +406,12 @@ function openSheet(id) {
       </div>
     </div>
 
-    <div class="sheet__block">
-      <div class="sheet__label">${svg("info")} Зачем сюда идти</div>
-      <p class="sheet__feature">${bar.feature}</p>
-    </div>
-
-    <div class="sheet__block">
-      <div class="sheet__label is-good">${svg("good")} Что заказать</div>
-      <ul class="sheet__order">${bar.order.map((o) => `<li>${o}</li>`).join("")}</ul>
-    </div>
-
+    ${featureBlock}
+    ${orderBlock}
     ${avoidBlock}
-
-    <div class="sheet__block">
-      <div class="sheet__label is-quest">${svg("target")} Квест от автора</div>
-      <div class="sheet__quest">
-        <p>${bar.quest}</p>
-        ${toast}
-      </div>
-    </div>
-
+    ${questBlock}
     ${noteBlock}
+    ${emptyHint}
 
     <div class="sheet__block">
       <div class="sheet__label">${svg("star")} Твоя оценка</div>
