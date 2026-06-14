@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Сбер — стейкхолдеры, проблемы и PR-решения</title>
+<meta name="description" content="Учебная презентация по практике PR: Сбер — стейкхолдеры, коммуникационные проблемы и PR-решения." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ===================== БАЗА ===================== */
+  :root{
+    --green:#21A038;
+    --green-d:#138a2c;
+    --green-l:#3dc257;
+    --teal:#00C2A8;
+    --lime:#7BE03B;
+    --yellow:#F5E000;
+    --ink:#0E1F15;
+    --muted:#5C6E63;
+    --bg-soft:#EEF6F0;
+    --line:rgba(15,40,25,.10);
+    --grad:linear-gradient(120deg,#1FA838 0%,#11B07A 55%,#00C2A8 100%);
+    --grad-bright:linear-gradient(120deg,#7BE03B 0%,#21A038 45%,#00C2A8 100%);
+    --risk:#E5573F;
+    --risk-soft:#FCEDE9;
+    --radius:22px;
+    --ease:cubic-bezier(.22,1,.36,1);
+    --dur:.62s;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    background:#05140C;
+    color:var(--ink);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  /* ===================== СЦЕНА / МАСШТАБ ===================== */
+  .deck{position:fixed;inset:0;display:grid;place-items:center;
+    background:
+      radial-gradient(80% 90% at 15% 0%, #0c2c1c 0%, transparent 55%),
+      radial-gradient(90% 100% at 100% 100%, #06281b 0%, transparent 55%),
+      #05120B;}
+  .stage{
+    width:1280px;height:720px;position:relative;
+    transform-origin:center center;
+    border-radius:26px;overflow:hidden;
+    box-shadow:0 50px 120px -30px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.04);
+  }
+
+  /* ===================== СЛАЙД ===================== */
+  .slide{
+    position:absolute;inset:0;padding:58px 72px;
+    display:flex;flex-direction:column;
+    opacity:0;visibility:hidden;
+    transform:translateX(48px) scale(.985);
+    transition:opacity var(--dur) ease, transform var(--dur) var(--ease), visibility var(--dur);
+    will-change:transform,opacity;
+  }
+  .slide.before{transform:translateX(-48px) scale(.985)}
+  .slide.active{opacity:1;visibility:visible;transform:none;z-index:2}
+
+  .slide.light{background:linear-gradient(140deg,#FFFFFF 0%,#EFF7F1 100%);color:var(--ink)}
+  .slide.tint{background:linear-gradient(140deg,#F3FAF4 0%,#E6F4EA 100%);color:var(--ink)}
+  .slide.dark{color:#EAF6EE;background:
+      radial-gradient(120% 130% at 85% -20%, #1a6f44 0%, #0c3a25 44%, #05180e 100%);}
+
+  /* плавающие пятна на тёмных слайдах */
+  .slide .blob{position:absolute;border-radius:50%;filter:blur(46px);opacity:.5;pointer-events:none;z-index:0}
+  .slide.dark .b1{width:420px;height:420px;left:-90px;bottom:-130px;background:radial-gradient(circle,#1fc27a,transparent 68%);animation:float1 14s var(--ease) infinite}
+  .slide.dark .b2{width:340px;height:340px;right:-60px;top:-90px;background:radial-gradient(circle,#0fb0a0,transparent 70%);opacity:.45;animation:float2 17s var(--ease) infinite}
+  @keyframes float1{50%{transform:translate(40px,-30px) scale(1.08)}}
+  @keyframes float2{50%{transform:translate(-34px,34px) scale(1.1)}}
+  .slide>*{position:relative;z-index:1}
+
+  /* ===================== ТИПОГРАФИКА ===================== */
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-weight:700;
+    font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);}
+  .slide.dark .eyebrow{color:#6ee59a}
+  .eyebrow::before{content:"";width:26px;height:3px;border-radius:3px;background:var(--grad)}
+  .eyebrow .n{margin-left:auto}
+
+  h2.title{font-size:42px;line-height:1.06;font-weight:800;letter-spacing:-.02em;margin:14px 0 4px}
+  .sub{font-size:18px;color:var(--muted);font-weight:500}
+  .slide.dark .sub{color:#a9c9b6}
+
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .slide.dark .grad-text{background:var(--grad-bright);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* ===================== КОМПОНЕНТЫ ===================== */
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:0 16px 40px -24px rgba(11,60,33,.45);}
+  .slide.dark .card{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.10);box-shadow:none;backdrop-filter:blur(6px)}
+
+  ul.bullets{list-style:none;display:flex;flex-direction:column;gap:16px}
+  ul.bullets li{position:relative;padding-left:34px;font-size:18.5px;line-height:1.45;font-weight:500}
+  ul.bullets li::before{content:"";position:absolute;left:0;top:.36em;width:18px;height:18px;border-radius:7px;
+    background:var(--grad);box-shadow:0 4px 10px -3px rgba(33,160,56,.6)}
+  ul.bullets li b{font-weight:800}
+
+  .stat{display:flex;flex-direction:column;gap:4px}
+  .stat-num{font-size:62px;font-weight:800;line-height:1;letter-spacing:-.02em;display:flex;align-items:baseline;gap:8px;
+    background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .slide.dark .stat-num{background:var(--grad-bright);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat-num .pre{font-size:.5em;font-weight:700;-webkit-text-fill-color:var(--muted);align-self:center}
+  .slide.dark .stat-num .pre{-webkit-text-fill-color:#9ec5ac}
+  .stat-num .unit{font-size:.34em;font-weight:700;letter-spacing:0}
+  .stat-label{font-size:16px;color:var(--muted);font-weight:600}
+  .slide.dark .stat-label{color:#a9c9b6}
+
+  .callout{border-radius:18px;padding:20px 26px;font-size:19px;font-weight:600;line-height:1.4;
+    background:var(--grad);color:#fff;display:flex;align-items:center;gap:16px;
+    box-shadow:0 22px 44px -22px rgba(17,176,122,.7)}
+  .callout svg{flex:0 0 auto}
+  .callout.msg{background:linear-gradient(120deg,#0E1F15,#15402a);box-shadow:0 22px 44px -24px rgba(0,0,0,.6)}
+
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:700;
+    padding:7px 13px;border-radius:999px;background:var(--bg-soft);color:var(--green-d);border:1px solid rgba(33,160,56,.18)}
+  .slide.dark .chip{background:rgba(110,229,154,.12);color:#9ff0bd;border-color:rgba(110,229,154,.22)}
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px}
+
+  .meta{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+  .slide.dark .meta{color:#8fb6a0}
+
+  .badge-num{flex:0 0 auto;width:56px;height:56px;border-radius:16px;display:grid;place-items:center;
+    font-weight:800;font-size:24px;color:#fff;background:var(--grad);box-shadow:0 12px 26px -12px rgba(33,160,56,.7)}
+
+  .tile{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;flex:0 0 auto;
+    background:var(--bg-soft);color:var(--green-d)}
+  .slide.dark .tile{background:rgba(110,229,154,.14);color:#8ef0b3}
+  .tile svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+  .risk{color:var(--risk);font-weight:800}
+  .risk-box{background:var(--risk-soft);border:1px solid rgba(229,87,63,.2);border-radius:13px;padding:12px 16px;
+    font-size:15.5px;font-weight:600;color:#a8331f;display:flex;gap:10px;align-items:flex-start;line-height:1.35}
+  .risk-box .rl{color:var(--risk);font-weight:800;flex:0 0 auto}
+
+  /* Сбер-знак */
+  .sber-mark{display:block}
+
+  /* ===================== HUD ===================== */
+  .hud{position:absolute;left:0;right:0;bottom:0;height:6px;z-index:6}
+  .hud .bar{height:100%;width:0;background:var(--grad-bright);transition:width .5s var(--ease);box-shadow:0 0 18px rgba(33,160,56,.6)}
+  .nav{position:absolute;right:26px;bottom:22px;display:flex;align-items:center;gap:12px;z-index:7;
+    font-weight:700;color:rgba(255,255,255,.92);font-size:13px;
+    background:rgba(8,28,18,.4);backdrop-filter:blur(8px);padding:8px 10px 8px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.12)}
+  .nav .count{letter-spacing:.05em;min-width:54px;text-align:center}
+  .nav .count b{color:#8ef0b3}
+  .navbtn{width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;display:grid;place-items:center;
+    background:rgba(255,255,255,.14);color:#fff;transition:.2s}
+  .navbtn:hover{background:var(--green)}
+  .navbtn:active{transform:scale(.92)}
+  .navbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .navbtn[disabled]{opacity:.32;cursor:default}
+  .navbtn[disabled]:hover{background:rgba(255,255,255,.14)}
+
+  .hint{position:absolute;left:72px;bottom:26px;z-index:7;color:#cdebd8;font-size:13.5px;font-weight:600;
+    display:flex;align-items:center;gap:8px;opacity:.85;animation:hintfade 1.2s ease forwards 5s}
+  @keyframes hintfade{to{opacity:0;visibility:hidden}}
+  .kbd{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:6px;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);font-size:12px;font-weight:700}
+
+  /* мини-бренд в углу контентных слайдов */
+  .slide-brand{position:absolute;top:30px;right:34px;display:flex;align-items:center;gap:9px;z-index:3;opacity:.92}
+  .slide-brand .sber-mark{width:26px;height:26px}
+  .slide-brand span{font-weight:800;font-size:17px;letter-spacing:-.01em}
+  .slide.dark .slide-brand span{color:#eafaf0}
+
+  /* ===================== АНИМАЦИЯ ПОЯВЛЕНИЯ ===================== */
+  .r{opacity:0;transform:translateY(30px);
+    transition:opacity .6s var(--ease), transform .6s var(--ease);
+    transition-delay:calc(var(--i,0)*70ms + 120ms)}
+  .slide.active .r{opacity:1;transform:none}
+  .r.pop{transform:translateY(0) scale(.9)}
+  .slide.active .r.pop{transform:none}
+
+  /* ===================== СЕТКИ / СПЕЦИФИКА СЛАЙДОВ ===================== */
+  .head{margin-bottom:26px}
+  .grow{flex:1;min-height:0}
+
+  /* Титул */
+  .title-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px}
+  .title-mark{width:92px;height:92px}
+  .title-big{font-size:112px;font-weight:800;line-height:.9;letter-spacing:-.04em}
+  .title-sub{font-size:27px;font-weight:600;max-width:760px;line-height:1.3;color:#dcf3e5}
+  .title-foot{position:absolute;left:72px;bottom:54px;color:#9fd1b3;font-weight:600;font-size:15px;display:flex;gap:14px;align-items:center}
+  .title-foot .dot{width:5px;height:5px;border-radius:50%;background:#6ee59a}
+
+  /* слайд 2 */
+  .two{display:grid;grid-template-columns:1.35fr .85fr;gap:28px;align-items:start}
+  .stat-stack{display:flex;flex-direction:column;gap:16px}
+  .stat-card{padding:22px 26px}
+
+  /* слайд 3 — карта стейкхолдеров */
+  .map-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .sh{padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+  .sh .name{font-size:19px;font-weight:800;letter-spacing:-.01em}
+  .sh .desc{font-size:15px;line-height:1.4;color:var(--muted)}
+  .slide.dark .sh .desc{color:#a9c9b6}
+
+  /* слайд 4 — ожидания */
+  .exp-row{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:center;
+    padding:15px 22px;border-radius:16px}
+  .exp-list{display:flex;flex-direction:column;gap:11px}
+  .exp-row .who{display:flex;align-items:center;gap:14px;font-weight:800;font-size:18px}
+  .exp-row .what{font-size:16.5px;line-height:1.35;font-weight:500}
+
+  /* слайд 5 — три проблемы */
+  .probs{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;flex:1;align-content:center}
+  .prob{padding:30px 26px;display:flex;flex-direction:column;gap:16px;min-height:330px}
+  .prob .pn{font-size:64px;font-weight:800;line-height:1;background:var(--grad-bright);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .prob .pt{font-size:23px;font-weight:800;letter-spacing:-.01em}
+  .prob .pd{font-size:16.5px;line-height:1.45;color:#bcd9c6}
+
+  /* слайд 6 / 7 — две колонки проблем */
+  .col2{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;min-height:0}
+  .pcard{padding:24px 26px;display:flex;flex-direction:column;gap:14px}
+  .pcard .ph{display:flex;align-items:center;gap:14px}
+  .pcard .ph .pt{font-size:21px;font-weight:800;letter-spacing:-.01em}
+  .pcard ul.bullets li{font-size:16px;padding-left:30px}
+  .pcard ul.bullets li::before{width:15px;height:15px;top:.32em}
+  .small-meta{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:7px}
+
+  /* слайд 7 решение */
+  .sol-stats{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .sol-stat{padding:16px 18px;border-radius:14px;background:var(--bg-soft)}
+  .sol-stat .stat-num{font-size:40px}
+  .sol-stat .stat-label{font-size:13.5px}
+  .mini-list{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14.5px;line-height:1.4}
+  .mini-list li{position:relative;padding-left:24px;font-weight:500}
+  .mini-list li::before{content:"";position:absolute;left:0;top:.45em;width:11px;height:11px;border-radius:4px;background:var(--grad)}
+  .tools-line{font-size:13.5px;color:var(--muted);line-height:1.4}
+  .tools-line b{color:var(--green-d);font-weight:800}
+
+  /* слайд 8 — инструменты */
+  .tools3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;flex:1;min-height:0}
+  .toolcard{padding:24px;display:flex;flex-direction:column;gap:16px}
+  .toolcard .th{display:flex;align-items:center;gap:13px;font-size:19px;font-weight:800}
+  .toolcard ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+  .toolcard li{position:relative;padding-left:26px;font-size:15px;line-height:1.38;font-weight:500}
+  .toolcard li::before{content:"";position:absolute;left:0;top:.5em;width:8px;height:8px;border-radius:50%;background:var(--green)}
+
+  /* слайд 9/10 — флагманы */
+  .flag{display:grid;grid-template-columns:1.55fr .9fr;gap:26px;flex:1;min-height:0}
+  .blocks{display:flex;flex-direction:column;gap:16px}
+  .block{display:grid;grid-template-columns:128px 1fr;gap:18px;align-items:start}
+  .block .bl{font-size:13px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#6ee59a;padding-top:2px}
+  .slide.light .block .bl{color:var(--green)}
+  .block .bt{font-size:16px;line-height:1.42;font-weight:500}
+  .side{padding:26px;display:flex;flex-direction:column;gap:18px;justify-content:center}
+  .side .sh-t{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6ee59a}
+  .side .closes{font-size:18px;font-weight:700;line-height:1.35}
+  .side .note{font-size:15px;line-height:1.4;color:#bcd9c6}
+  .side-nums{display:flex;flex-direction:column;gap:20px}
+  .side-nums .stat-num{font-size:46px}
+
+  /* слайд 11 — измерение */
+  .kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;flex:1;min-height:0;align-content:center}
+  .kpicard{padding:22px 26px;display:flex;gap:18px;align-items:flex-start}
+  .kpicard .kt{font-size:19px;font-weight:800;margin-bottom:6px}
+  .kpicard .kd{font-size:15.5px;line-height:1.42;color:var(--muted);font-weight:500}
+
+  /* финал */
+  .closing-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:24px}
+  .closing-mark{width:84px;height:84px}
+  .closing-big{font-size:74px;font-weight:800;letter-spacing:-.03em;line-height:1}
+  .closing-msg{font-size:24px;font-weight:600;max-width:780px;line-height:1.35;color:#dcf3e5}
+
+  @media (prefers-reduced-motion: reduce){
+    .slide,.r{transition-duration:.001s}
+    .blob{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- общий градиент для всех Сбер-знаков -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="sberGrad" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#0FB85A"/>
+      <stop offset=".55" stop-color="#21A038"/>
+      <stop offset="1" stop-color="#00D2A8"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- ===== СЛАЙД 1 — ТИТУЛ ===== -->
+    <section class="slide dark title">
+      <span class="blob b1"></span><span class="blob b2"></span>
+      <div class="eyebrow r" style="--i:0">Практикум по связям с общественностью<span style="margin:0 10px;opacity:.5">·</span>Кейс компании</div>
+      <div class="title-wrap">
+        <div class="r" data-mark="title-mark" style="--i:1"></div>
+        <div class="title-big r grad-text" style="--i:2">Сбер</div>
+        <div class="title-sub r" style="--i:3">Стейкхолдеры, коммуникационные проблемы и&nbsp;PR-решения</div>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 2 — СБЕР СЕГОДНЯ ===== -->
+    <section class="slide light content">
+      <div class="head">
+        <div class="eyebrow r" style="--i:0">Контекст<span class="n">01</span></div>
+        <h2 class="title r" style="--i:1">Сбер сегодня</h2>
+      </div>
+      <div class="two grow">
+        <ul class="bullets">
+          <li class="r" style="--i:2"><b>Крупнейший банк страны.</b> Целая экосистема сервисов — финансы, торговля, доставка, здоровье, развлечения, — не просто госбанк.</li>
+          <li class="r" style="--i:3"><b>Опора новой идентичности</b> — искусственный интеллект и собственная модель GigaChat.</li>
+          <li class="r" style="--i:4"><b>С 2022 года под санкциями;</b> фокус сместился на внутренний рынок и дружественные страны.</li>
+        </ul>
+        <div class="stat-stack">
+          <div class="card stat-card stat r pop" style="--i:3">
+            <div class="stat-num"><span class="count" data-to="111" data-dec="0"></span><span class="unit">млн</span></div>
+            <div class="stat-label">Активных клиентов</div>
+          </div>
+          <div class="card stat-card stat r pop" style="--i:4">
+            <div class="stat-num"><span class="pre">≈</span><span class="count" data-to="3.5" data-dec="1"></span><span class="unit">млн</span></div>
+            <div class="stat-label">Компаний-клиентов</div>
+          </div>
+        </div>
+      </div>
+      <div class="callout r" style="--i:5">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/></svg>
+        <span>Сберкасса осталась в прошлом — сейчас это полноценная экосистема. Но восприятие за этим сдвигом не поспевает.</span>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 3 — СТЕЙКХОЛДЕРЫ ===== -->
+    <section class="slide dark content">
+      <span class="blob b1"></span><span class="blob b2"></span>
+      <div class="head">
+        <div class="eyebrow r" style="--i:0">Карта стейкхолдеров<span class="n">02</span></div>
+        <h2 class="title r" style="--i:1">Кто вокруг Сбера</h2>
+      </div>
+      <div class="map-grid grow" style="align-content:center">
+        <div class="card sh r" style="--i:2">
+          <div class="tile"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg></div>
+          <div class="name">Государство — акционер</div>
+          <div class="desc">и регуляторы: Банк России, законодатели</div>
+        </div>
+        <div class="card sh r" style="--i:3">
+          <div class="tile"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 7-7M21 7h-5M21 7v5"/></svg></div>
+          <div class="name">Инвесторы</div>
+          <div class="desc">миноритарии, институциональные держатели</div>
+        </div>
+        <div class="card sh r" style="--i:4">
+          <div class="tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5"/></svg></div>
+          <div class="name">Клиенты</div>
+          <div class="desc">розница, малый и средний бизнес, корпорации</div>
+        </div>
+        <div class="card sh r" style="--i:5">
+          <div class="tile"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="10" r="2.4"/><path d="M8 16.5c0-2 1.8-3 4-3s4 1 4 3"/></svg></div>
+          <div class="name">Сотрудники и кадры</div>
+          <div class="desc">персонал, менеджмент, потенциальные сотрудники</div>
+        </div>
+        <div class="card sh r" style="--i:6">
+          <div class="tile"><svg viewBox="0 0 24 24"><path d="M10.5 13.5a3.5 3.5 0 005 0l2.5-2.5a3.5 3.5 0 00-5-5l-1 1"/><path d="M13.5 10.5a3.5 3.5 0 00-5 0L6 13a3.5 3.5 0 005 5l1-1"/></svg></div>
+          <div class="name">Партнёры</div>
+          <div class="desc">компании экосистемы, поставщики, техпартнёры</div>
+        </div>
+        <div class="card sh r" style="--i:7">
+          <div class="tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18"/></svg></div>
+          <div class="name">Общество и медиа</div>
+          <div class="desc">регионы, НКО, профсообщество, СМИ</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 4 — ОЖИДАНИЯ ===== -->
+    <section class="slide light content">
+      <div class="head">
+        <div class="eyebrow r" style="--i:0">Ожидания<span class="n">03</span></div>
+        <h2 class="title r" style="--i:1">Чего ждут ключевые группы</h2>
+      </div>
+      <div class="exp-list grow" style="justify-content:center">
+        <div class="exp-row card r" style="--i:2">
+          <div class="who"><span class="tile"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12"/></svg></span>Регулятор и государство</div>
+          <div class="what">Устойчивость, соблюдение норм, вклад в экономику и создание технического суверенитета</div>
+        </div>
+        <div class="exp-row card r" style="--i:3">
+          <div class="who"><span class="tile"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 7-7M21 7h-5M21 7v5"/></svg></span>Инвесторы</div>
+          <div class="what">Прозрачность, предсказуемость, рост стоимости</div>
+        </div>
+        <div class="exp-row card r" style="--i:4">
+          <div class="who"><span class="tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5"/></svg></span>Клиенты</div>
+          <div class="what">Выгодная экономическая политика, надёжность, удобство</div>
+        </div>
+        <div class="exp-row card r" style="--i:5">
+          <div class="who"><span class="tile"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="10" r="2.4"/><path d="M8 16.5c0-2 1.8-3 4-3s4 1 4 3"/></svg></span>Сотрудники</div>
+          <div class="what">Стабильная работа, развитие, репутация как работодателя</div>
+        </div>
+        <div class="exp-row card r" style="--i:6">
+          <div class="who"><span class="tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18"/></svg></span>Общество</div>
+          <div class="what">Безопасность, доступность услуг, ответственность бизнеса</div>
+        </div>
+      </div>
+      <div class="callout msg r" style="--i:7">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6ee59a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16"/></svg>
+        <span style="color:#eafaf0">Интересы расходятся — например, быстрое внедрение ИИ против тревоги за данные. На стыках такого рода и возникают коммуникационные проблемы.</span>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 5 — ТРИ ПРОБЛЕМЫ ===== -->
+    <section class="slide dark content">
+      <span class="blob b1"></span><span class="blob b2"></span>
+      <div class="head">
+        <div class="eyebrow r" style="--i:0">Диагноз<span class="n">04</span></div>
+        <h2 class="title r" style="--i:1">Три коммуникационные проблемы</h2>
+      </div>
+      <div class="probs">
+        <div class="card prob r" style="--i:2">
+          <div class="pn">01</div>
+          <div class="pt">Разрыв в восприятии</div>
+          <div class="pd">«Привычный госбанк» стал целой экосистемой.</div>
+        </div>
+        <div class="card prob r" style="--i:3">
+          <div class="pn">02</div>
+          <div class="pt">Доверие и безопасность</div>
+          <div class="pd">Мошенничество и настороженность к данным и ИИ бьют по доверию.</div>
+        </div>
+        <div class="card prob r" style="--i:4">
+          <div class="pn">03</div>
+          <div class="pt">«Госбанк на господдержке»</div>
+          <div class="pd">Мнение, что успех Сбера держится на привилегиях, а не на эффективности.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 6 — ПРОБЛЕМЫ 1 и 2 ===== -->
+    <section class="slide light content">
+      <div class="head">
+        <div class="eyebrow r" style="--i:0">Проблемы 1 и 2<span class="n">05</span></div>
+        <h2 class="title r" style="--i:1">Восприятие и доверие</h2>
+      </div>
+      <div class="col2">
+        <div class="card pcard r" style="--i:2">
+          <div class="ph"><span class="badge-num">01</span><span class="pt">Разрыв в восприятии</span></div>
+          <ul class="bullets">
+            <li>Сбер вкладывается в ИИ, но в массовом сознании остаётся «Сбербанком» — банком по старой привычке.</li>
+            <li>Реальная идентичность опережает репутацию.</li>
+          </ul>
+          <div style="margin-top:auto">
+            <div class="small-meta">Кого касается</div>
+            <div class="chip-row">
+              <span class="chip">Общество</span><span class="chip">IT-сообщество</span>
+              <span class="chip">Инвесторы</span><span class="chip">Кандидаты</span>
+            </div>
+          </div>
+        </div>
+        <div class="card pcard r" style="--i:3">
+          <div class="ph"><span class="badge-num">02</span><span class="pt">Доверие и безопасность</span></div>
+          <ul class="bullets">
+            <li>Телефонное мошенничество растёт; потеряв деньги, человек нередко винит банк.</li>
+            <li>Рядом — тревога вокруг обработки данных и ИИ.</li>
+          </ul>
+          <div class="risk-box"><span class="rl">Риск</span><span>Подрывается главный актив банка — доверие.</span></div>
+          <div>
+            <div class="small-meta">Кого касается</div>
+            <div class="chip-row">
+              <span class="chip">Розничные клиенты</span><span class="chip">Регулятор</span><span class="chip">Общество</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 7 — ПРОБЛЕМА 3 + РЕШЕНИЕ ===== -->
+    <section class="slide tint content">
+      <div class="head">
+        <div class="eyebrow r" style="--i:0">Проблема 3 и решение<span class="n">06</span></div>
+        <h2 class="title r" style="--i:1">«Госбанк на господдержке» → вклад в бюджет</h2>
+      </div>
+      <div class="col2">
+        <div class="card pcard r" style="--i:2">
+          <div class="ph"><span class="badge-num">03</span><span class="pt">«Госбанк на господдержке»</span></div>
+          <ul class="bullets">
+            <li>Мнение: Сбер силён не эффективностью, а госстатусом — поддержкой, близостью к власти.</li>
+          </ul>
+          <div class="risk-box"><span class="rl">Риск</span><span>Достижения обесцениваются, представляются «нерыночными».</span></div>
+          <div>
+            <div class="small-meta">Кого касается</div>
+            <div class="chip-row"><span class="chip">Общество</span><span class="chip">Деловое и экспертное сообщество</span></div>
+          </div>
+          <div class="callout msg" style="margin-top:auto;padding:14px 18px;font-size:16px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ee59a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            <span style="color:#eafaf0">Не государство содержит Сбер — Сбер наполняет бюджет.</span>
+          </div>
+        </div>
+        <div class="card pcard r" style="--i:3">
+          <div class="ph"><span class="tile" style="width:56px;height:56px;border-radius:16px"><svg viewBox="0 0 24 24" style="width:28px;height:28px"><path d="M3 17l6-6 4 4 7-7M21 7h-5M21 7v5"/></svg></span><span class="pt">Решение: показать вклад в&nbsp;экономику</span></div>
+          <div class="sol-stats">
+            <div class="sol-stat stat">
+              <div class="stat-num"><span class="count" data-to="1.3" data-dec="1"></span><span class="unit">трлн ₽</span></div>
+              <div class="stat-label">Вклад в бюджет за 2025 год</div>
+            </div>
+            <div class="sol-stat stat">
+              <div class="stat-num"><span class="count" data-to="543" data-dec="0"></span><span class="unit">млрд ₽</span></div>
+              <div class="stat-label">Из них налог на прибыль</div>
+            </div>
+          </div>
+          <div>
+            <div class="small-meta">Рыночный успех, а не только статус</div>
+            <ul class="mini-list">
+              <li>Самая дорогая компания на бирже</li>
+              <li>Лидер по внедрению ИИ в России</li>
+              <li>Одно из лучших соотношений расходов к доходам</li>
+            </ul>
+          </div>
+          <div class="tools-line" style="margin-top:auto"><b>Инструменты:</b> годовой отчёт и МСФО, деловые СМИ, выступления топ-менеджмента, инфографика о вкладе в экономику, IR / GR.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 8 — ИНСТРУМЕНТЫ ПОД КАЖДУЮ ПРОБЛЕМУ ===== -->
+    <section class="slide light content">
+      <div class="head">
+        <div class="eyebrow r" style="--i:0">Инструментарий<span class="n">07</span></div>
+        <h2 class="title r" style="--i:1">Инструменты под каждую проблему</h2>
+      </div>
+      <div class="tools3">
+        <div class="card toolcard r" style="--i:2">
+          <div class="th"><span class="tile"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>Восприятие</div>
+          <ul>
+            <li>Экспертные публикации и выступления</li>
+            <li>Профильные СМИ</li>
+            <li>Конференция AI Journey</li>
+            <li>Узнаваемые спикеры</li>
+          </ul>
+        </div>
+        <div class="card toolcard r" style="--i:3">
+          <div class="th"><span class="tile"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.2-3 7.4-7 8.5-4-1.1-7-4.3-7-8.5V6z"/><path d="M9 12l2 2 4-4"/></svg></span>Доверие</div>
+          <ul>
+            <li>Просвещение по фин- и цифровой грамотности</li>
+            <li>Протоколы реагирования на инциденты</li>
+            <li>Открытый разговор о защите данных</li>
+            <li>Партнёрство с государством и НКО</li>
+          </ul>
+        </div>
+        <div class="card toolcard r" style="--i:4">
+          <div class="th"><span class="tile"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>«Госбанк на господдержке»</div>
+          <ul>
+            <li>Факты о вкладе в бюджет</li>
+            <li>Годовой отчёт и МСФО</li>
+            <li>Деловые СМИ</li>
+            <li>Инфографика об экономическом вкладе</li>
+            <li>IR / GR</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 9 — ФЛАГМАН 1: AI JOURNEY ===== -->
+    <section class="slide dark content">
+      <span class="blob b1"></span><span class="blob b2"></span>
+      <div class="head">
+        <div class="eyebrow r" style="--i:0">Флагманский проект 1<span class="n">08</span></div>
+        <h2 class="title r" style="--i:1">Конференция <span class="grad-text">AI&nbsp;Journey</span></h2>
+      </div>
+      <div class="flag">
+        <div class="blocks">
+          <div class="block r" style="--i:2"><div class="bl">Формат</div><div class="bt">Ежегодная международная конференция по ИИ — научный, деловой и образовательный треки, открытая онлайн-трансляция, конкурсы для разработчиков.</div></div>
+          <div class="block r" style="--i:3"><div class="bl">Роль площадки</div><div class="bt">На AI Journey Сбер представляет новые версии GigaChat — событие работает как витрина технологий.</div></div>
+          <div class="block r" style="--i:4"><div class="bl">На кого</div><div class="bt">Разработчики и учёные, IT-сообщество, медиа, частично государство и инвесторы.</div></div>
+          <div class="block r" style="--i:5"><div class="bl">Зачем</div><div class="bt">Закрепить образ техлидера, показать зрелость GigaChat и научной школы, повысить доверие к российскому ИИ.</div></div>
+        </div>
+        <div class="card side r pop" style="--i:4">
+          <div class="sh-t">Что закрывает</div>
+          <div class="closes">Проблему №1 — Восприятие; отчасти №2 — Доверие к ИИ.</div>
+          <div class="note">Показывает, что Сбер конкурирует на технологиях.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 10 — ФЛАГМАН 2: СБЕРУНИВЕРСИТЕТ ===== -->
+    <section class="slide dark content">
+      <span class="blob b1"></span><span class="blob b2"></span>
+      <div class="head">
+        <div class="eyebrow r" style="--i:0">Флагманский проект 2<span class="n">09</span></div>
+        <h2 class="title r" style="--i:1"><span class="grad-text">СберУниверситет</span></h2>
+      </div>
+      <div class="flag">
+        <div class="blocks">
+          <div class="block r" style="--i:2"><div class="bl">Формат</div><div class="bt">Корпоративный университет с кампусом в Истре — программы для сотрудников и руководителей плюс открытые форматы.</div></div>
+          <div class="block r" style="--i:3"><div class="bl">Публичное событие</div><div class="bt">Ежегодная конференция «Больше чем обучение».</div></div>
+          <div class="block r" style="--i:4"><div class="bl">На кого</div><div class="bt">Внутри — сотрудники и менеджмент; снаружи — кандидаты, студенты и вузы, профсообщество, медиа.</div></div>
+          <div class="block r" style="--i:5"><div class="bl">Зачем</div><div class="bt">Усилить репутацию работодателя, показать экспертизу в образовании и управлении.</div></div>
+        </div>
+        <div class="card side r pop" style="--i:4">
+          <div class="side-nums">
+            <div class="stat"><div class="stat-num"><span class="pre">≈</span><span class="count" data-to="10000" data-dec="0"></span></div><div class="stat-label">участников очно и онлайн</div></div>
+            <div class="stat"><div class="stat-num"><span class="count" data-to="4" data-dec="0"></span><span class="unit">млн+</span></div><div class="stat-label">просмотров трансляции</div></div>
+            <div class="stat"><div class="stat-num"><span class="count" data-to="50" data-dec="0"></span><span class="unit">+</span></div><div class="stat-label">спикеров</div></div>
+          </div>
+          <div class="closes" style="font-size:15px;border-top:1px solid rgba(255,255,255,.12);padding-top:14px">Закрывает проблему №1 — Восприятие.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 11 — ИЗМЕРЕНИЕ РЕЗУЛЬТАТА ===== -->
+    <section class="slide light content">
+      <div class="head">
+        <div class="eyebrow r" style="--i:0">Оценка эффективности<span class="n">10</span></div>
+        <h2 class="title r" style="--i:1">Как измеряем результат</h2>
+      </div>
+      <div class="kpi">
+        <div class="card kpicard r" style="--i:2">
+          <span class="tile"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.5 7.2L4 21l1.8-5.3A8 8 0 1121 12z"/></svg></span>
+          <div><div class="kt">Медиа</div><div class="kd">Число и тональность упоминаний; доля «технологического» сюжета в публикациях.</div></div>
+        </div>
+        <div class="card kpicard r" style="--i:3">
+          <span class="tile"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.2-3 7.4-7 8.5-4-1.1-7-4.3-7-8.5V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
+          <div><div class="kt">Доверие</div><div class="kd">Опросы восприятия (банк против экосистемы); тема безопасности.</div></div>
+        </div>
+        <div class="card kpicard r" style="--i:4">
+          <span class="tile"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M7 7l-3 7h6zM17 7l-3 7h6zM8 21h8"/></svg></span>
+          <div><div class="kt">Легитимность</div><div class="kd">Доля публикаций, где Сбер показан как вкладчик в бюджет и рыночный игрок.</div></div>
+        </div>
+        <div class="card kpicard r" style="--i:5">
+          <span class="tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="3"/><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5M3 12a9 9 0 0118 0"/></svg></span>
+          <div><div class="kt">Охваты</div><div class="kd">Аудитория ключевых событий: AI Journey и «Больше чем обучение».</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== СЛАЙД 12 — ФИНАЛ ===== -->
+    <section class="slide dark closing">
+      <span class="blob b1"></span><span class="blob b2"></span>
+      <div class="closing-wrap">
+        <div class="r" data-mark="closing-mark" style="--i:0"></div>
+        <div class="closing-big r grad-text" style="--i:1">Спасибо за внимание</div>
+        <div class="closing-msg r" style="--i:2">Не государство содержит Сбер — Сбер наполняет бюджет. Сильная репутация строится на фактах, технологиях и открытом разговоре с каждой группой стейкхолдеров.</div>
+      </div>
+      <div class="title-foot r" style="--i:3">
+        <span>Практикум по связям с общественностью</span>
+        <span class="dot"></span>
+        <span>Кейс компании «Сбер»</span>
+      </div>
+    </section>
+
+  </div><!-- /stage -->
+
+  <!-- HUD -->
+  <div class="hud"><div class="bar" id="bar"></div></div>
+  <div class="hint">
+    <span class="kbd">←</span><span class="kbd">→</span> листать слайды · <span class="kbd">F</span> на весь экран
+  </div>
+  <div class="nav">
+    <button class="navbtn" id="prev" aria-label="Назад"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <span class="count"><b id="cur">01</b> / <span id="total">12</span></span>
+    <button class="navbtn" id="next" aria-label="Вперёд"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+</div>
+
+<script>
+(function(){
+  // --- Сбер-знак (кольцо с галочкой, фирменный градиент) ---
+  function mark(cls){
+    return '<svg class="sber-mark '+(cls||'')+'" viewBox="0 0 100 100" aria-hidden="true">'
+      + '<circle cx="50" cy="50" r="38" fill="none" stroke="url(#sberGrad)" stroke-width="13" '
+      + 'stroke-linecap="round" stroke-dasharray="182 56.76" stroke-dashoffset="28.4" transform="rotate(-90 50 50)"/>'
+      + '<path d="M30 50 L45 65 L74 30" fill="none" stroke="url(#sberGrad)" stroke-width="13" '
+      + 'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  document.querySelectorAll('[data-mark]').forEach(function(el){ el.innerHTML = mark(el.dataset.mark); });
+
+  // мини-бренд в углу контентных слайдов
+  document.querySelectorAll('.slide.content').forEach(function(s){
+    var b=document.createElement('div'); b.className='slide-brand';
+    b.innerHTML = mark('') + '<span>Сбер</span>';
+    s.appendChild(b);
+  });
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length, cur = 0;
+  document.getElementById('total').textContent = String(total).padStart(2,'0');
+
+  // индексы для каскадной анимации
+  slides.forEach(function(s){
+    s.querySelectorAll('.r').forEach(function(el,i){
+      if(!el.style.getPropertyValue('--i')) el.style.setProperty('--i', i);
+    });
+  });
+
+  function fmt(v, dec){
+    var parts = Number(v).toFixed(dec).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return dec>0 ? parts.join(',') : parts[0];
+  }
+  function runCounters(slide){
+    slide.querySelectorAll('.count').forEach(function(el){
+      var to = parseFloat(el.dataset.to), dec = parseInt(el.dataset.dec||'0',10);
+      var dur = 1100, t0 = null;
+      function step(t){
+        if(!t0) t0 = t;
+        var p = Math.min((t - t0)/dur, 1);
+        var e = 1 - Math.pow(1-p, 3); // easeOutCubic
+        el.textContent = fmt(to*e, dec);
+        if(p<1) requestAnimationFrame(step); else el.textContent = fmt(to, dec);
+      }
+      el.textContent = fmt(0, dec);
+      requestAnimationFrame(step);
+    });
+  }
+
+  function render(){
+    slides.forEach(function(s,i){
+      s.classList.toggle('active', i===cur);
+      s.classList.toggle('before', i<cur);
+    });
+    document.getElementById('bar').style.width = ((cur+1)/total*100)+'%';
+    document.getElementById('cur').textContent = String(cur+1).padStart(2,'0');
+    document.getElementById('prev').disabled = cur===0;
+    document.getElementById('next').disabled = cur===total-1;
+    runCounters(slides[cur]);
+  }
+  function go(n){ cur = Math.max(0, Math.min(total-1, n)); render(); }
+  function next(){ go(cur+1); }
+  function prev(){ go(cur-1); }
+
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); next(); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); prev(); }
+    else if(e.key==='Home'){ go(0); }
+    else if(e.key==='End'){ go(total-1); }
+    else if(e.key==='f'||e.key==='F'){ toggleFs(); }
+  });
+
+  // клик по слайду: правая половина — вперёд, левая — назад (кроме кнопок)
+  document.getElementById('stage').addEventListener('click', function(e){
+    if(e.target.closest('.nav, a, button')) return;
+    var r = this.getBoundingClientRect();
+    if((e.clientX - r.left) > r.width*0.5) next(); else prev();
+  });
+
+  // свайпы для тача
+  var tx=0;
+  document.getElementById('stage').addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+  document.getElementById('stage').addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>50){ dx<0?next():prev(); }
+  });
+
+  function toggleFs(){
+    if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){})(); }
+    else if(document.exitFullscreen){ document.exitFullscreen(); }
+  }
+
+  // масштаб сцены под окно (сохраняем 16:9)
+  function scale(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    document.getElementById('stage').style.transform = 'scale('+s+')';
+  }
+  window.addEventListener('resize', scale);
+  scale();
+  render();
+})();
+</script>
+</body>
+</html>
