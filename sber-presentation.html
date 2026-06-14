@@ -273,7 +273,23 @@
 
   @media (prefers-reduced-motion: reduce){
     .slide,.r{transition-duration:.001s}
-    .blob{animation:none}
+    .slide .blob{animation:none}
+  }
+
+  /* ===================== ПЕЧАТЬ / ЭКСПОРТ В PDF ===================== */
+  /* Ctrl/Cmd+P → «Сохранить как PDF»: 12 страниц 16:9, со всем текстом и цветом */
+  @media print{
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    @page{size:1280px 720px;margin:0}
+    html,body{width:1280px;height:auto;overflow:visible;background:#fff}
+    .deck{position:static;display:block;height:auto;background:#fff;place-items:initial}
+    .stage{position:static;transform:none!important;width:1280px;height:auto;border-radius:0;box-shadow:none;overflow:visible}
+    .slide{position:relative!important;inset:auto!important;width:1280px;height:720px;overflow:hidden;
+      opacity:1!important;visibility:visible!important;transform:none!important;
+      page-break-after:always;break-after:page}
+    .slide:last-child{page-break-after:auto;break-after:auto}
+    .slide .r{opacity:1!important;transform:none!important}
+    .hud,.nav,.hint{display:none!important}
   }
 </style>
 </head>
@@ -318,11 +334,11 @@
         </ul>
         <div class="stat-stack">
           <div class="card stat-card stat r pop" style="--i:3">
-            <div class="stat-num"><span class="count" data-to="111" data-dec="0"></span><span class="unit">млн</span></div>
+            <div class="stat-num"><span class="counter" data-to="111" data-dec="0"></span><span class="unit">млн</span></div>
             <div class="stat-label">Активных клиентов</div>
           </div>
           <div class="card stat-card stat r pop" style="--i:4">
-            <div class="stat-num"><span class="pre">≈</span><span class="count" data-to="3.5" data-dec="1"></span><span class="unit">млн</span></div>
+            <div class="stat-num"><span class="pre">≈</span><span class="counter" data-to="3.5" data-dec="1"></span><span class="unit">млн</span></div>
             <div class="stat-label">Компаний-клиентов</div>
           </div>
         </div>
@@ -498,11 +514,11 @@
           <div class="ph"><span class="tile" style="width:56px;height:56px;border-radius:16px"><svg viewBox="0 0 24 24" style="width:28px;height:28px"><path d="M3 17l6-6 4 4 7-7M21 7h-5M21 7v5"/></svg></span><span class="pt">Решение: показать вклад в&nbsp;экономику</span></div>
           <div class="sol-stats">
             <div class="sol-stat stat">
-              <div class="stat-num"><span class="count" data-to="1.3" data-dec="1"></span><span class="unit">трлн ₽</span></div>
+              <div class="stat-num"><span class="counter" data-to="1.3" data-dec="1"></span><span class="unit">трлн ₽</span></div>
               <div class="stat-label">Вклад в бюджет за 2025 год</div>
             </div>
             <div class="sol-stat stat">
-              <div class="stat-num"><span class="count" data-to="543" data-dec="0"></span><span class="unit">млрд ₽</span></div>
+              <div class="stat-num"><span class="counter" data-to="543" data-dec="0"></span><span class="unit">млрд ₽</span></div>
               <div class="stat-label">Из них налог на прибыль</div>
             </div>
           </div>
@@ -595,9 +611,9 @@
         </div>
         <div class="card side r pop" style="--i:4">
           <div class="side-nums">
-            <div class="stat"><div class="stat-num"><span class="pre">≈</span><span class="count" data-to="10000" data-dec="0"></span></div><div class="stat-label">участников очно и онлайн</div></div>
-            <div class="stat"><div class="stat-num"><span class="count" data-to="4" data-dec="0"></span><span class="unit">млн+</span></div><div class="stat-label">просмотров трансляции</div></div>
-            <div class="stat"><div class="stat-num"><span class="count" data-to="50" data-dec="0"></span><span class="unit">+</span></div><div class="stat-label">спикеров</div></div>
+            <div class="stat"><div class="stat-num"><span class="pre">≈</span><span class="counter" data-to="10000" data-dec="0"></span></div><div class="stat-label">участников очно и онлайн</div></div>
+            <div class="stat"><div class="stat-num"><span class="counter" data-to="4" data-dec="0"></span><span class="unit">млн+</span></div><div class="stat-label">просмотров трансляции</div></div>
+            <div class="stat"><div class="stat-num"><span class="counter" data-to="50" data-dec="0"></span><span class="unit">+</span></div><div class="stat-label">спикеров</div></div>
           </div>
           <div class="closes" style="font-size:15px;border-top:1px solid rgba(255,255,255,.12);padding-top:14px">Закрывает проблему №1 — Восприятие.</div>
         </div>
@@ -695,7 +711,7 @@
     return dec>0 ? parts.join(',') : parts[0];
   }
   function runCounters(slide){
-    slide.querySelectorAll('.count').forEach(function(el){
+    slide.querySelectorAll('.counter').forEach(function(el){
       var to = parseFloat(el.dataset.to), dec = parseInt(el.dataset.dec||'0',10);
       var dur = 1100, t0 = null;
       function step(t){
@@ -761,7 +777,16 @@
     var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
     document.getElementById('stage').style.transform = 'scale('+s+')';
   }
+  // финальные значения счётчиков — чтобы при печати в PDF числа были на всех слайдах
+  function setAllFinal(){
+    document.querySelectorAll('.counter').forEach(function(el){
+      el.textContent = fmt(parseFloat(el.dataset.to), parseInt(el.dataset.dec||'0',10));
+    });
+  }
+  window.addEventListener('beforeprint', setAllFinal);
+
   window.addEventListener('resize', scale);
+  setAllFinal();
   scale();
   render();
 })();
