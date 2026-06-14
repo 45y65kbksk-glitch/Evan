@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сбер — стейкхолдеры, коммуникационные проблемы и PR-решения</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   СБЕР · Презентация ТПСО
+   Самодостаточный HTML — фирменный стиль, переходы и анимации
+   ============================================================ */
+
+:root{
+  --g1:#21A038;            /* зелёный Сбер   */
+  --g2:#12B3A6;            /* бирюзовый      */
+  --g3:#F1D000;            /* жёлтый акцент  */
+  --sber: linear-gradient(120deg,#1FA02E 0%, #11B19F 55%, #F1D000 120%);
+  --sber-soft: linear-gradient(120deg,#1FA02E 0%, #11B19F 70%);
+  --ink:#0E1A14;
+  --muted:#5C6B63;
+  --line:#E4EBE6;
+  --bg:#F4F7F5;
+  --card:#FFFFFF;
+  --shadow:0 10px 34px rgba(16,44,30,.07);
+  --shadow-lg:0 24px 60px rgba(16,44,30,.14);
+  --radius:20px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Inter','Manrope',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  background:#05100B;
+  color:var(--ink);
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.display{font-family:'Manrope','Inter',sans-serif}
+
+/* ---------- Сцена со скейлом 1280×720 ---------- */
+#viewport{position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 120% at 50% 0%,#0a1f16 0%,#05100B 60%)}
+#stage{
+  position:absolute;top:50%;left:50%;
+  width:1280px;height:720px;
+  transform:translate(-50%,-50%);
+  transform-origin:center center;
+}
+
+/* ---------- Слайды ---------- */
+.slide{
+  position:absolute;inset:0;
+  background:var(--bg);
+  padding:62px 72px;
+  display:flex;flex-direction:column;
+  opacity:0;visibility:hidden;
+  overflow:hidden;
+  border-radius:6px;
+}
+.slide.is-active{opacity:1;visibility:visible;z-index:2;animation:enterFwd .62s cubic-bezier(.22,.7,.3,1) both}
+#stage.dir-back .slide.is-active{animation-name:enterBack}
+@keyframes enterFwd{from{opacity:0;transform:translateX(46px) scale(.992)}to{opacity:1;transform:none}}
+@keyframes enterBack{from{opacity:0;transform:translateX(-46px) scale(.992)}to{opacity:1;transform:none}}
+
+/* мягкие градиентные пятна-подложки */
+.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;pointer-events:none;z-index:0}
+.blob.b1{width:420px;height:420px;right:-120px;top:-150px;background:radial-gradient(circle,#7be0c0,transparent 65%)}
+.blob.b2{width:360px;height:360px;left:-140px;bottom:-160px;background:radial-gradient(circle,#a9e87a,transparent 65%)}
+.slide>:not(.blob){position:relative;z-index:1}
+
+/* ---------- Типографика / компоненты ---------- */
+.kicker{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:#178a2c}
+.kdot{width:16px;height:16px;border-radius:6px;background:var(--sber);box-shadow:0 3px 10px rgba(18,179,166,.5)}
+.title{font-size:46px;font-weight:800;line-height:1.06;letter-spacing:-.02em;margin:14px 0 6px}
+.title.sm{font-size:40px}
+.lead{font-size:21px;color:var(--muted);max-width:62ch;line-height:1.45}
+.grad{background:var(--sber);-webkit-background-clip:text;background-clip:text;color:transparent}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;margin-top:8px}
+
+.cols{display:grid;gap:26px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c12-10{grid-template-columns:1.05fr .95fr}
+
+ul.blist{list-style:none}
+.blist li{position:relative;padding-left:30px;margin:.62em 0;font-size:19.5px;line-height:1.42;color:#243029}
+.blist li::before{content:"";position:absolute;left:0;top:.34em;width:14px;height:14px;border-radius:5px;background:var(--sber)}
+.blist.tight li{margin:.42em 0;font-size:18px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
+.card h3{font-size:21px;font-weight:800;margin-bottom:6px;letter-spacing:-.01em}
+.card p{font-size:17px;color:var(--muted);line-height:1.4}
+.card .ico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eafaef,#e3f7f4);margin-bottom:12px}
+.card .ico svg{width:25px;height:25px;stroke:#13a06f;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.lab{font-weight:700;color:#178a2c}
+
+.callout{position:relative;background:linear-gradient(120deg,#EFFaf2,#E7F7F4);border-radius:16px;padding:18px 24px 18px 28px;overflow:hidden}
+.callout::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--sber)}
+.callout .ct{font-size:19px;line-height:1.42;color:#1c2a22}
+.callout strong{font-weight:800}
+.callout .tag{display:block;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#159a8f;margin-bottom:5px}
+
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 20px;box-shadow:var(--shadow)}
+.stat .num{font-family:'Manrope';font-weight:800;font-size:50px;line-height:1;letter-spacing:-.02em;background:var(--sber-soft);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat .lab2{display:block;color:var(--muted);font-size:15.5px;margin-top:7px;font-weight:500}
+
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{display:inline-block;padding:8px 15px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:15px;color:#33413a;box-shadow:0 2px 8px rgba(16,44,30,.04)}
+
+.field{margin:.7em 0}
+.field .fl{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#159a8f;margin-bottom:3px}
+.field .fv{font-size:18px;line-height:1.4;color:#243029}
+
+/* ---------- Анимация появления элементов ---------- */
+.reveal{opacity:0}
+.slide.is-active .reveal{animation:rise .6s cubic-bezier(.22,.7,.3,1) both;animation-delay:calc(var(--d,0)*1ms)}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+/* ============================================================
+   СЛАЙД 1 — Титул (тёмный)
+   ============================================================ */
+#s1{background:#06140D;color:#fff;justify-content:center;padding:72px 86px}
+#s1 .blob{opacity:.85;filter:blur(70px)}
+#s1 .blob.b1{width:560px;height:560px;right:-160px;top:-180px;background:radial-gradient(circle,#13b3a6,transparent 62%)}
+#s1 .blob.b2{width:520px;height:520px;left:-180px;bottom:-220px;background:radial-gradient(circle,#1fa02e,transparent 62%)}
+#s1 .blob.b3{width:300px;height:300px;right:120px;bottom:-120px;opacity:.55;background:radial-gradient(circle,#f1d000,transparent 60%)}
+#s1 .eyebrow{font-weight:700;font-size:16px;letter-spacing:.2em;text-transform:uppercase;color:#8fe7c9}
+#s1 .big{font-size:138px;font-weight:800;letter-spacing:-.04em;line-height:.92;margin:18px 0 4px;display:flex;align-items:center;gap:26px}
+#s1 .big .grad{background:linear-gradient(115deg,#9be88a 0%,#3fd6c0 50%,#f1d000 110%);-webkit-background-clip:text;background-clip:text;color:transparent}
+#s1 .sub{font-size:27px;font-weight:600;color:#eafff6;max-width:24ch;line-height:1.2;margin-top:6px}
+#s1 .rule{width:78px;height:5px;border-radius:4px;background:var(--sber);margin:30px 0 24px}
+#s1 .work{align-self:flex-start;display:inline-flex;align-items:center;gap:9px;padding:9px 18px;border:1px solid rgba(255,255,255,.22);border-radius:999px;font-size:16px;color:#dffaf0;background:rgba(255,255,255,.04);backdrop-filter:blur(4px)}
+#s1 .work .dot{width:9px;height:9px;border-radius:50%;background:var(--sber)}
+#s1 .author{margin-top:20px;font-size:18px;color:#9fb6ac}
+#s1 .author .ph{color:#dffaf0;border-bottom:1px dashed rgba(255,255,255,.35);padding-bottom:1px}
+.logomark{width:120px;height:120px;flex:0 0 auto;animation:spinIn 1s cubic-bezier(.22,.7,.3,1) both}
+@keyframes spinIn{from{opacity:0;transform:rotate(-90deg) scale(.6)}to{opacity:1;transform:none}}
+
+/* ---------- Двойной слайд проблем 1/2 ---------- */
+.pcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow);display:flex;flex-direction:column;height:100%}
+.pcard .ph{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.pcard .pn{font-family:'Manrope';font-weight:800;font-size:40px;line-height:1;background:var(--sber-soft);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pcard h3{font-size:23px;font-weight:800;letter-spacing:-.01em}
+.pcard .blist li{font-size:17px;margin:.45em 0;color:#33413a}
+.pcard .blist li::before{width:11px;height:11px;top:.42em}
+.pcard .foot{margin-top:auto;padding-top:12px;border-top:1px dashed var(--line);font-size:15.5px;color:#33413a}
+.pcard .foot .row{margin-top:5px}
+.risk{color:#c0392b;font-weight:700}
+
+/* ---------- Слайд 5: три проблемы ---------- */
+.big3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;height:100%}
+.prob{position:relative;background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px 26px;box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.prob::after{content:"";position:absolute;left:0;right:0;bottom:0;height:6px;background:var(--sber)}
+.prob .pn{font-family:'Manrope';font-weight:800;font-size:78px;line-height:.9;background:var(--sber);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.04em}
+.prob h3{font-size:25px;font-weight:800;margin:14px 0 10px;letter-spacing:-.01em}
+.prob p{font-size:18px;color:var(--muted);line-height:1.42}
+
+/* ---------- мелкие иконки в кружке ---------- */
+.icob{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eafaef,#e3f7f4);flex:0 0 auto}
+.icob svg{width:23px;height:23px;stroke:#13a06f;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+/* строка «группа → ожидание» */
+.row5{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow)}
+.row5 .g{font-weight:800;font-size:17.5px;flex:0 0 240px}
+.row5 .v{font-size:16.5px;color:#46554c;line-height:1.35}
+
+/* ============================================================
+   UI поверх сцены
+   ============================================================ */
+#ui{position:fixed;inset:0;pointer-events:none;z-index:50}
+#progress{position:fixed;left:0;top:0;height:4px;width:0;background:var(--sber);transition:width .5s cubic-bezier(.22,.7,.3,1);z-index:60;box-shadow:0 0 12px rgba(18,179,166,.6)}
+.navbtn{position:fixed;bottom:26px;width:46px;height:46px;border-radius:50%;border:none;background:rgba(255,255,255,.9);box-shadow:var(--shadow-lg);cursor:pointer;pointer-events:auto;display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s}
+.navbtn:hover{transform:translateY(-2px);background:#fff}
+.navbtn svg{width:20px;height:20px;stroke:#178a2c;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#prev{right:84px}#next{right:30px}
+#counter{position:fixed;left:30px;bottom:30px;pointer-events:auto;font-family:'Manrope';font-weight:700;font-size:15px;color:#fff;background:rgba(8,22,15,.55);padding:8px 15px;border-radius:999px;backdrop-filter:blur(6px);letter-spacing:.06em}
+#counter b{color:#7be0c0}
+#brand{position:fixed;right:30px;top:22px;pointer-events:none;display:flex;align-items:center;gap:9px;font-family:'Manrope';font-weight:800;font-size:18px;color:#0E1A14;opacity:.0;transition:opacity .4s}
+#brand.show{opacity:.85}
+#brand .lm{width:26px;height:26px}
+#hint{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);pointer-events:none;font-size:13.5px;color:#fff;background:rgba(8,22,15,.5);padding:7px 16px;border-radius:999px;backdrop-filter:blur(6px);transition:opacity .6s;letter-spacing:.02em}
+#fsbtn{position:fixed;right:30px;bottom:84px;width:42px;height:42px;border-radius:12px;border:none;background:rgba(255,255,255,.9);box-shadow:var(--shadow-lg);cursor:pointer;pointer-events:auto;display:flex;align-items:center;justify-content:center}
+#fsbtn svg{width:18px;height:18px;stroke:#178a2c;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* клик-зоны навигации */
+.tapzone{position:fixed;top:0;bottom:120px;width:22%;pointer-events:auto;z-index:40;cursor:pointer}
+#tapL{left:0}#tapR{right:0;cursor:pointer}
+
+/* ============================================================
+   ПЕЧАТЬ / PDF — все слайды видимы, по одному на страницу
+   ============================================================ */
+@page{size:1280px 720px;margin:0}
+@media print{
+  html,body{background:#fff!important;overflow:visible!important}
+  #viewport{position:static!important;background:#fff!important}
+  #stage{position:static!important;transform:none!important;width:auto!important;height:auto!important}
+  #ui,#progress,#counter,#brand,#hint,#fsbtn,.navbtn,.tapzone{display:none!important}
+  .slide{position:relative!important;inset:auto!important;opacity:1!important;visibility:visible!important;
+         width:1280px!important;height:720px!important;page-break-after:always;break-after:page;border-radius:0!important}
+  .slide:last-child{page-break-after:auto}
+  .reveal{opacity:1!important;transform:none!important;animation:none!important}
+  *{animation:none!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+</style>
+</head>
+<body>
+<div id="viewport">
+<div id="stage">
+
+  <!-- ============== СЛАЙД 1 — ТИТУЛ ============== -->
+  <section class="slide" id="s1" data-slide="1">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+    <div class="eyebrow reveal" style="--d:80">Теория и практика связей с общественностью</div>
+    <div class="big reveal" style="--d:180">
+      <svg class="logomark" viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#21A038"/><stop offset=".5" stop-color="#13B3A6"/><stop offset="1" stop-color="#F1D000"/>
+        </linearGradient></defs>
+        <path d="M32 7 A25 25 0 1 0 57 32" fill="none" stroke="url(#lg)" stroke-width="7" stroke-linecap="round"/>
+        <path d="M20 31 L29 40 L52 17" fill="none" stroke="url(#lg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="grad">Сбер</span>
+    </div>
+    <div class="sub reveal" style="--d:280">Стейкхолдеры, коммуникационные проблемы и&nbsp;PR-решения</div>
+    <div class="rule reveal" style="--d:360"></div>
+    <span class="work reveal" style="--d:420"><span class="dot"></span>Семестровый проект</span>
+    <div class="author reveal" style="--d:500"><span class="ph">[ Ваше имя ]</span> &nbsp;·&nbsp; <span class="ph">[ факультет, группа ]</span> &nbsp;·&nbsp; 2026</div>
+  </section>
+
+  <!-- ============== СЛАЙД 2 — СБЕР СЕГОДНЯ ============== -->
+  <section class="slide" data-slide="2">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="kicker reveal" style="--d:40"><span class="kdot"></span>01 · Сбер сегодня</div>
+    <h2 class="title reveal" style="--d:90">Больше, чем банк — <span class="grad">технологическая платформа</span></h2>
+    <div class="body">
+      <div class="cols c12-10">
+        <div>
+          <ul class="blist">
+            <li class="reveal" style="--d:160">Крупнейший банк страны и финтех-группа — а не просто банк.</li>
+            <li class="reveal" style="--d:230">Опора новой идентичности — искусственный интеллект и собственная модель <b>GigaChat</b>.</li>
+            <li class="reveal" style="--d:300">Экосистема сервисов: финансы, торговля, доставка, здоровье, развлечения, облако, устройства. Цель — около <b>30%</b> дохода от небанковских сервисов.</li>
+            <li class="reveal" style="--d:370">С 2022 года под западными санкциями; фокус сместился на внутренний рынок и дружественные страны.</li>
+          </ul>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="stat reveal" style="--d:260"><span class="num" data-target="111" data-suffix=" млн"></span><span class="lab2">активных клиентов</span></div>
+          <div class="stat reveal" style="--d:330"><span class="num" data-target="3.5" data-decimals="1" data-prefix="≈" data-suffix=" млн"></span><span class="lab2">компаний-клиентов</span></div>
+          <div class="stat reveal" style="--d:400"><span class="num" data-target="30" data-prefix="~" data-suffix="%"></span><span class="lab2">цель — доля небанковских сервисов в доходе</span></div>
+        </div>
+      </div>
+      <div class="callout reveal" style="--d:470;margin-top:22px">
+        <span class="tag">Ключевая мысль</span>
+        <div class="ct">«Сберкасса» осталась в прошлом — сейчас это технологическая платформа. <strong>Но восприятие за этим сдвигом не поспевает.</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== СЛАЙД 3 — СТЕЙКХОЛДЕРЫ ≠ ЦА ============== -->
+  <section class="slide" data-slide="3">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="kicker reveal" style="--d:40"><span class="kdot"></span>02 · Карта стейкхолдеров</div>
+    <h2 class="title sm reveal" style="--d:90">Стейкхолдеры — это <span class="grad">не целевая аудитория</span></h2>
+    <div class="body">
+      <div class="cols c2" style="align-items:start">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="card reveal" style="--d:160"><h3>Стейкхолдер</h3><p>Тот, кто влияет на компанию или зависит от неё. Критерий — интерес или влияние, а не факт покупки.</p></div>
+          <div class="card reveal" style="--d:220"><h3>Целевая аудитория</h3><p>Адресат конкретного сообщения или кампании.</p></div>
+          <div class="callout reveal" style="--d:280"><div class="ct" style="font-size:17px">Клиент бывает и тем и другим; регулятор — стейкхолдер, но не ЦА рекламы.</div></div>
+        </div>
+        <div>
+          <div class="fl reveal" style="--d:140;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#159a8f;margin-bottom:10px">Карта стейкхолдеров Сбера</div>
+          <div class="cols" style="grid-template-columns:1fr 1fr;gap:12px">
+            <div class="card reveal" style="--d:180;padding:14px 16px"><div class="ico" style="width:38px;height:38px;margin-bottom:8px"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg></div><h3 style="font-size:17px">Государство и&nbsp;регуляторы</h3><p style="font-size:14px">Банк России, государство-акционер, законодатели</p></div>
+            <div class="card reveal" style="--d:230;padding:14px 16px"><div class="ico" style="width:38px;height:38px;margin-bottom:8px"><svg viewBox="0 0 24 24"><path d="M4 18l5-5 3 3 7-8M21 8v4h-4"/></svg></div><h3 style="font-size:17px">Инвесторы</h3><p style="font-size:14px">Миноритарии, институциональные держатели</p></div>
+            <div class="card reveal" style="--d:280;padding:14px 16px"><div class="ico" style="width:38px;height:38px;margin-bottom:8px"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M16 6a3 3 0 010 6M21 20c0-2-1.5-3.5-3.5-4.2"/></svg></div><h3 style="font-size:17px">Клиенты</h3><p style="font-size:14px">Розница, малый и средний бизнес, корпорации</p></div>
+            <div class="card reveal" style="--d:330;padding:14px 16px"><div class="ico" style="width:38px;height:38px;margin-bottom:8px"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></div><h3 style="font-size:17px">Сотрудники и&nbsp;кадры</h3><p style="font-size:14px">Персонал, менеджмент, кандидаты, вузы</p></div>
+            <div class="card reveal" style="--d:380;padding:14px 16px"><div class="ico" style="width:38px;height:38px;margin-bottom:8px"><svg viewBox="0 0 24 24"><path d="M8 13l-4 4M11 7l2-2a3 3 0 014 4l-2 2M9 11l4 4"/><path d="M13 11l-2 2"/></svg></div><h3 style="font-size:17px">Партнёры</h3><p style="font-size:14px">Компании экосистемы, поставщики, техпартнёры</p></div>
+            <div class="card reveal" style="--d:430;padding:14px 16px"><div class="ico" style="width:38px;height:38px;margin-bottom:8px"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div><h3 style="font-size:17px">Общество и&nbsp;медиа</h3><p style="font-size:14px">Регионы, НКО, профсообщество, СМИ</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== СЛАЙД 4 — ЧЕГО ЖДУТ ГРУППЫ ============== -->
+  <section class="slide" data-slide="4">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="kicker reveal" style="--d:40"><span class="kdot"></span>03 · Ожидания</div>
+    <h2 class="title reveal" style="--d:90">Чего ждут <span class="grad">ключевые группы</span></h2>
+    <div class="body">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="row5 reveal" style="--d:150"><span class="icob"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg></span><span class="g">Регулятор и&nbsp;государство</span><span class="v">Устойчивость, соблюдение норм, вклад в экономику и технологический суверенитет.</span></div>
+        <div class="row5 reveal" style="--d:210"><span class="icob"><svg viewBox="0 0 24 24"><path d="M4 18l5-5 3 3 7-8M21 8v4h-4"/></svg></span><span class="g">Инвесторы</span><span class="v">Прозрачность, предсказуемость, рост стоимости.</span></div>
+        <div class="row5 reveal" style="--d:270"><span class="icob"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg></span><span class="g">Клиенты</span><span class="v">Сохранность денег и данных, надёжность, удобство, понятная выгода.</span></div>
+        <div class="row5 reveal" style="--d:330"><span class="icob"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg></span><span class="g">Сотрудники и&nbsp;кандидаты</span><span class="v">Интересные задачи, развитие, репутация работодателя.</span></div>
+        <div class="row5 reveal" style="--d:390"><span class="icob"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span class="g">Общество</span><span class="v">Безопасность, доступность услуг, ответственность бизнеса.</span></div>
+      </div>
+      <div class="callout reveal" style="--d:460;margin-top:18px">
+        <span class="tag">Вывод</span>
+        <div class="ct">Интересы расходятся — например, быстрое внедрение ИИ против тревоги за данные. <strong>На этих стыках и возникают коммуникационные проблемы.</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== СЛАЙД 5 — ТРИ ПРОБЛЕМЫ ============== -->
+  <section class="slide" data-slide="5">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="kicker reveal" style="--d:40"><span class="kdot"></span>04 · Диагноз</div>
+    <h2 class="title reveal" style="--d:90">Три <span class="grad">коммуникационные проблемы</span></h2>
+    <div class="body">
+      <div class="big3">
+        <div class="prob reveal" style="--d:180"><div class="pn">1</div><h3>Разрыв в восприятии</h3><p>«Привычный госбанк» против образа технологического лидера.</p></div>
+        <div class="prob reveal" style="--d:300"><div class="pn">2</div><h3>Доверие и&nbsp;безопасность</h3><p>Мошенничество и настороженность к данным и ИИ бьют по доверию.</p></div>
+        <div class="prob reveal" style="--d:420"><div class="pn">3</div><h3>«Госбанк на&nbsp;господдержке»</h3><p>Мнение, что успех держится на госстатусе, а не на эффективности.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== СЛАЙД 6 — ПРОБЛЕМЫ 1 И 2 ============== -->
+  <section class="slide" data-slide="6">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="kicker reveal" style="--d:40"><span class="kdot"></span>05 · Крупным планом</div>
+    <h2 class="title sm reveal" style="--d:90">Проблемы <span class="grad">1 и 2</span> — детально</h2>
+    <div class="body">
+      <div class="cols c2" style="height:100%">
+        <div class="pcard reveal" style="--d:170">
+          <div class="ph"><span class="pn">1</span><h3>Разрыв в&nbsp;восприятии</h3></div>
+          <ul class="blist">
+            <li>Сбер вкладывается в ИИ, но в массовом сознании остаётся «Сбербанком» — банком по привычке.</li>
+            <li>Реальная идентичность опережает репутацию.</li>
+          </ul>
+          <div class="foot">
+            <div class="row"><span class="lab">Кого касается:</span> общество, IT-сообщество, инвесторы, кандидаты.</div>
+            <div class="row"><span class="risk">Риск:</span> вложения в технологии не превращаются в образ лидера.</div>
+          </div>
+        </div>
+        <div class="pcard reveal" style="--d:300">
+          <div class="ph"><span class="pn">2</span><h3>Доверие и&nbsp;безопасность</h3></div>
+          <ul class="blist">
+            <li>Телефонное мошенничество растёт; потеряв деньги, человек нередко винит банк.</li>
+            <li>Рядом — тревога вокруг обработки данных и ИИ.</li>
+          </ul>
+          <div class="foot">
+            <div class="row"><span class="lab">Кого касается:</span> розничные клиенты, регулятор, общество.</div>
+            <div class="row"><span class="risk">Риск:</span> подрывается главный актив банка — доверие.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== СЛАЙД 7 — ПРОБЛЕМА 3 + РЕШЕНИЕ ============== -->
+  <section class="slide" data-slide="7">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="kicker reveal" style="--d:40"><span class="kdot"></span>06 · Проблема 3 и ответ</div>
+    <h2 class="title sm reveal" style="--d:90">«Госбанк на&nbsp;господдержке» — <span class="grad">и ответ на него</span></h2>
+    <div class="body">
+      <div class="cols c12-10" style="height:100%;align-items:stretch">
+        <div class="pcard reveal" style="--d:170;border-top:4px solid #e6b3ac">
+          <div class="ph"><span class="pn" style="background:linear-gradient(120deg,#d65a4a,#e08a3c);-webkit-background-clip:text;background-clip:text">3</span><h3>В чём упрёк</h3></div>
+          <ul class="blist">
+            <li>Сбер силён не своей эффективностью, а госстатусом: дешёвым фондированием, системной поддержкой, близостью к власти.</li>
+          </ul>
+          <div class="foot">
+            <div class="row"><span class="lab">Кого касается:</span> общество, деловое и экспертное сообщество, инвесторы.</div>
+            <div class="row"><span class="risk">Риск:</span> достижения банка обесцениваются как «нерыночные».</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="fl reveal" style="--d:230;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#159a8f">Решение: показать обратный поток ценности</div>
+          <div class="cols c2" style="gap:12px">
+            <div class="stat reveal" style="--d:280;padding:13px 16px"><span class="num" style="font-size:38px" data-target="1.3" data-decimals="1" data-suffix=" трлн ₽"></span><span class="lab2" style="font-size:13.5px">вклад группы в бюджет за 2025</span></div>
+            <div class="stat reveal" style="--d:330;padding:13px 16px"><span class="num" style="font-size:38px" data-target="543" data-suffix=" млрд ₽"></span><span class="lab2" style="font-size:13.5px">из них налог на прибыль</span></div>
+          </div>
+          <ul class="blist tight reveal" style="--d:380"><li style="font-size:15.5px">Рыночный успех, а не только статус: самая дорогая компания на бирже, лидер по внедрению ИИ в России, одно из лучших соотношений расходов к доходам.</li></ul>
+          <div class="callout reveal" style="--d:430;padding:13px 18px 13px 22px"><div class="ct" style="font-size:16.5px"><strong>Не государство содержит Сбер — Сбер наполняет бюджет.</strong></div></div>
+          <div class="chips reveal" style="--d:480">
+            <span class="chip" style="font-size:13px;padding:6px 12px">Годовой отчёт и МСФО</span>
+            <span class="chip" style="font-size:13px;padding:6px 12px">Деловые СМИ</span>
+            <span class="chip" style="font-size:13px;padding:6px 12px">Выступления топ-менеджмента</span>
+            <span class="chip" style="font-size:13px;padding:6px 12px">Инфографика о вкладе</span>
+            <span class="chip" style="font-size:13px;padding:6px 12px">IR / GR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== СЛАЙД 8 — ИНСТРУМЕНТЫ ============== -->
+  <section class="slide" data-slide="8">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="kicker reveal" style="--d:40"><span class="kdot"></span>07 · Инструменты</div>
+    <h2 class="title reveal" style="--d:90">Инструменты <span class="grad">под каждую проблему</span></h2>
+    <div class="body">
+      <div class="cols c3" style="height:100%;align-items:stretch">
+        <div class="card reveal" style="--d:170;display:flex;flex-direction:column">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 00-5 16.5V21h10v-1.5A9 9 0 0012 3z"/><path d="M9 21h6M12 8v4"/></svg></div>
+          <h3>Восприятие</h3>
+          <ul class="blist tight" style="margin-top:6px">
+            <li>Экспертные публикации и выступления</li>
+            <li>Профильные СМИ</li>
+            <li>Конференция AI Journey</li>
+            <li>Узнаваемые спикеры</li>
+          </ul>
+        </div>
+        <div class="card reveal" style="--d:300;display:flex;flex-direction:column">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h3>Доверие</h3>
+          <ul class="blist tight" style="margin-top:6px">
+            <li>Финансовая и цифровая грамотность</li>
+            <li>Протоколы реагирования на инциденты</li>
+            <li>Открытый разговор о защите данных</li>
+            <li>Партнёрство с государством и НКО</li>
+          </ul>
+        </div>
+        <div class="card reveal" style="--d:430;display:flex;flex-direction:column">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 16V9m4 7V6m4 10v-4"/></svg></div>
+          <h3>«Госбанк на&nbsp;господдержке»</h3>
+          <ul class="blist tight" style="margin-top:6px">
+            <li>Факты о вкладе в бюджет</li>
+            <li>Годовой отчёт и МСФО</li>
+            <li>Деловые СМИ</li>
+            <li>Инфографика об экономическом вкладе</li>
+            <li>IR / GR</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== СЛАЙД 9 — ФЛАГМАН 1: AI JOURNEY ============== -->
+  <section class="slide" data-slide="9">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="kicker reveal" style="--d:40"><span class="kdot"></span>08 · Флагман 1</div>
+    <h2 class="title reveal" style="--d:90">Конференция <span class="grad">AI Journey</span></h2>
+    <div class="body">
+      <div class="cols c12-10" style="align-items:start">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="card reveal" style="--d:170">
+            <div class="field"><div class="fl">Формат</div><div class="fv">Ежегодная международная конференция по ИИ: научный, деловой и образовательный треки, открытая онлайн-трансляция, конкурсы для разработчиков и исследователей.</div></div>
+          </div>
+          <div class="card reveal" style="--d:240">
+            <div class="field"><div class="fl">Роль площадки</div><div class="fv">Здесь Сбер представляет новые версии <b>GigaChat</b> — событие работает как витрина технологий.</div></div>
+          </div>
+          <div class="card reveal" style="--d:310">
+            <div class="field"><div class="fl">На кого</div><div class="fv">Разработчики и учёные, IT-сообщество, медиа, частично государство и инвесторы.</div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="callout reveal" style="--d:280">
+            <span class="tag">Зачем</span>
+            <div class="ct" style="font-size:17.5px">Закрепить образ технологического лидера, показать зрелость GigaChat и научной школы, повысить доверие к российскому ИИ.</div>
+          </div>
+          <div class="card reveal" style="--d:360">
+            <div class="fl" style="font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#159a8f;margin-bottom:8px">Какие проблемы закрывает</div>
+            <div class="chips">
+              <span class="chip" style="background:linear-gradient(120deg,#eafaef,#e3f7f4);border-color:#cdeede;font-weight:600">№1 · Восприятие</span>
+              <span class="chip" style="background:linear-gradient(120deg,#eafaef,#e3f7f4);border-color:#cdeede;font-weight:600">отчасти №2 · Доверие к ИИ</span>
+            </div>
+            <p class="card" style="border:none;box-shadow:none;padding:10px 0 0;color:var(--muted);font-size:16px">Показывает, что Сбер конкурирует на технологиях.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== СЛАЙД 10 — ФЛАГМАН 2: СБЕРУНИВЕРСИТЕТ ============== -->
+  <section class="slide" data-slide="10">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="kicker reveal" style="--d:40"><span class="kdot"></span>09 · Флагман 2</div>
+    <h2 class="title reveal" style="--d:90"><span class="grad">СберУниверситет</span></h2>
+    <div class="body">
+      <div class="cols c12-10" style="align-items:start">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="card reveal" style="--d:170">
+            <div class="field"><div class="fl">Формат</div><div class="fv">Корпоративный университет с кампусом в Истре: программы для сотрудников и руководителей плюс открытые форматы.</div></div>
+          </div>
+          <div class="card reveal" style="--d:240">
+            <div class="field"><div class="fl">Публичное событие</div><div class="fv">Ежегодная конференция «Больше чем обучение».</div></div>
+          </div>
+          <div class="card reveal" style="--d:310">
+            <div class="field"><div class="fl">На кого</div><div class="fv"><b>Внутри</b> — сотрудники и менеджмент. <b>Снаружи</b> — кандидаты, студенты и вузы, профессиональное сообщество, медиа.</div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="cols c3" style="gap:10px">
+            <div class="stat reveal" style="--d:260;padding:13px 12px;text-align:center"><span class="num" style="font-size:33px" data-target="10000" data-prefix="≈"></span><span class="lab2" style="font-size:12.5px">участников очно и онлайн</span></div>
+            <div class="stat reveal" style="--d:320;padding:13px 12px;text-align:center"><span class="num" style="font-size:33px" data-target="4" data-suffix=" млн+"></span><span class="lab2" style="font-size:12.5px">просмотров трансляции</span></div>
+            <div class="stat reveal" style="--d:380;padding:13px 12px;text-align:center"><span class="num" style="font-size:33px" data-target="50" data-suffix="+"></span><span class="lab2" style="font-size:12.5px">спикеров</span></div>
+          </div>
+          <div class="callout reveal" style="--d:420">
+            <span class="tag">Зачем</span>
+            <div class="ct" style="font-size:17.5px">Усилить репутацию работодателя, показать экспертизу в образовании и управлении.</div>
+          </div>
+          <div class="card reveal" style="--d:470">
+            <div class="fl" style="font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#159a8f;margin-bottom:8px">Какие проблемы закрывает</div>
+            <div class="chips"><span class="chip" style="background:linear-gradient(120deg,#eafaef,#e3f7f4);border-color:#cdeede;font-weight:600">№1 · Образ современной, развивающей организации</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== СЛАЙД 11 — ИЗМЕРЕНИЕ ============== -->
+  <section class="slide" data-slide="11">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="kicker reveal" style="--d:40"><span class="kdot"></span>10 · Результат</div>
+    <h2 class="title reveal" style="--d:90">Как <span class="grad">измерять результат</span></h2>
+    <div class="body">
+      <div class="cols c2" style="gap:16px">
+        <div class="card reveal" style="--d:170"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 16v-5m4 5V8m4 8v-3"/></svg></div><h3>Медиа</h3><p style="font-size:16px">Число и тональность упоминаний; доля «технологического» сюжета в публикациях.</p></div>
+        <div class="card reveal" style="--d:240"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Доверие</h3><p style="font-size:16px">Опросы восприятия (банк против техкомпании); динамика темы безопасности.</p></div>
+        <div class="card reveal" style="--d:310"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg></div><h3>Легитимность</h3><p style="font-size:16px">Доля публикаций, где Сбер показан как вкладчик в бюджет и рыночный игрок.</p></div>
+        <div class="card reveal" style="--d:380"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="#13a06f"/></svg></div><h3>Охваты</h3><p style="font-size:16px">Аудитория ключевых событий — AI Journey и «Больше чем обучение».</p></div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /stage -->
+</div><!-- /viewport -->
+
+<!-- ============== UI ============== -->
+<div id="progress"></div>
+<div id="brand"><svg class="lm" viewBox="0 0 64 64"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#21A038"/><stop offset=".5" stop-color="#13B3A6"/><stop offset="1" stop-color="#F1D000"/></linearGradient></defs><path d="M32 7 A25 25 0 1 0 57 32" fill="none" stroke="url(#lg2)" stroke-width="8" stroke-linecap="round"/><path d="M20 31 L29 40 L52 17" fill="none" stroke="url(#lg2)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>Сбер</div>
+<div id="counter"><b id="cnow">01</b> / <span id="ctot">11</span></div>
+<button class="navbtn" id="prev" aria-label="Назад"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+<button class="navbtn" id="next" aria-label="Вперёд"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+<button id="fsbtn" aria-label="На весь экран"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+<div id="hint">← → пролистывать · F — на весь экран</div>
+<div class="tapzone" id="tapL"></div>
+<div class="tapzone" id="tapR"></div>
+
+<script>
+(function(){
+  "use strict";
+  var stage   = document.getElementById('stage');
+  var slides  = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total   = slides.length;
+  var cur     = 0;
+  document.getElementById('ctot').textContent = String(total).padStart(2,'0');
+
+  /* ---- масштабирование сцены под окно ---- */
+  function fit(){
+    var s = Math.min(window.innerWidth/1280, window.innerHeight/720);
+    stage.style.transform = 'translate(-50%,-50%) scale('+s+')';
+  }
+  window.addEventListener('resize', fit); fit();
+
+  /* ---- форматирование чисел (рус.) ---- */
+  function fmt(v, dec, pre, suf){
+    var s = v.toFixed(dec).replace('.', ',');
+    var parts = s.split(',');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return (pre||'') + (parts.length>1 ? parts[0]+','+parts[1] : parts[0]) + (suf||'');
+  }
+  function prefill(el){
+    el.textContent = fmt(parseFloat(el.dataset.target), parseInt(el.dataset.decimals||'0'),
+                         el.dataset.prefix, el.dataset.suffix);
+  }
+  document.querySelectorAll('[data-target]').forEach(prefill);
+
+  function countUp(el){
+    var target = parseFloat(el.dataset.target),
+        dec = parseInt(el.dataset.decimals||'0'),
+        pre = el.dataset.prefix, suf = el.dataset.suffix,
+        dur = 1050, t0 = performance.now();
+    function tick(now){
+      var t = Math.min(1, (now-t0)/dur),
+          e = 1 - Math.pow(1-t, 3);
+      el.textContent = fmt(target*e, dec, pre, suf);
+      if(t<1) requestAnimationFrame(tick); else el.textContent = fmt(target, dec, pre, suf);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* ---- навигация ---- */
+  function show(n, dir){
+    n = Math.max(0, Math.min(total-1, n));
+    if(n===cur && slides[cur].classList.contains('is-active')) return;
+    stage.classList.toggle('dir-back', dir<0);
+    slides[cur].classList.remove('is-active');
+    cur = n;
+    var sl = slides[cur];
+    /* перезапуск анимации */
+    void sl.offsetWidth;
+    sl.classList.add('is-active');
+    document.getElementById('cnow').textContent = String(cur+1).padStart(2,'0');
+    document.getElementById('progress').style.width = ((cur)/(total-1)*100)+'%';
+    document.getElementById('brand').classList.toggle('show', cur!==0);
+    /* счётчики на активном слайде */
+    sl.querySelectorAll('[data-target]').forEach(function(el){
+      el.textContent = fmt(0, parseInt(el.dataset.decimals||'0'), el.dataset.prefix, el.dataset.suffix);
+      setTimeout(function(){ countUp(el); }, 260 + (parseInt(el.style.getPropertyValue('--d'))||0));
+    });
+  }
+  function nextS(){ show(cur+1, 1); }
+  function prevS(){ show(cur-1, -1); }
+
+  document.getElementById('next').addEventListener('click', nextS);
+  document.getElementById('prev').addEventListener('click', prevS);
+  document.getElementById('tapR').addEventListener('click', nextS);
+  document.getElementById('tapL').addEventListener('click', prevS);
+
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '||e.key==='Enter'){ e.preventDefault(); nextS(); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); prevS(); }
+    else if(e.key==='Home'){ show(0,-1); }
+    else if(e.key==='End'){ show(total-1,1); }
+    else if(e.key==='f'||e.key==='F'){ toggleFs(); }
+  });
+
+  /* свайпы */
+  var tx=0, ty=0;
+  document.addEventListener('touchstart', function(e){ tx=e.touches[0].clientX; ty=e.touches[0].clientY; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)){ dx<0 ? nextS() : prevS(); }
+  }, {passive:true});
+
+  /* полный экран */
+  function toggleFs(){
+    if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){}).call(document.documentElement); }
+    else if(document.exitFullscreen){ document.exitFullscreen(); }
+  }
+  document.getElementById('fsbtn').addEventListener('click', toggleFs);
+
+  /* скрыть подсказку */
+  setTimeout(function(){ var h=document.getElementById('hint'); if(h) h.style.opacity='0'; }, 4200);
+
+  /* старт */
+  show(0, 1);
+})();
+</script>
+</body>
+</html>
