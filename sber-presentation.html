@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0c1f14" />
+<title>Сбер — Стейкхолдеры, коммуникационные проблемы и PR-решения</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --green:#21A038;
+  --green-d:#0E8A2E;
+  --teal:#00D7C2;
+  --blue:#11A7E4;
+  --ink:#13211A;
+  --muted:#5d7068;
+  --bg:#eef2f0;
+  --card:#ffffff;
+  --line:rgba(16,40,28,.09);
+  --grad:linear-gradient(120deg,#21A038 0%,#00C95F 34%,#00D7C2 64%,#11A7E4 100%);
+  --grad-rev:linear-gradient(300deg,#21A038 0%,#00C95F 34%,#00D7C2 64%,#11A7E4 100%);
+  --grad-soft:linear-gradient(120deg,rgba(33,160,56,.10),rgba(17,167,228,.10));
+  --shadow:0 22px 60px -28px rgba(11,70,38,.45);
+  --shadow-sm:0 10px 30px -16px rgba(11,70,38,.35);
+  --radius:26px;
+  --r-sm:16px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  background:#0c1f14;
+  color:var(--ink);
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- DECK ---------- */
+.deck{
+  position:fixed;inset:0;
+  background:var(--bg);
+  overflow:hidden;
+}
+/* decorative gradient blobs on light slides */
+.deck::before,.deck::after{
+  content:"";position:absolute;border-radius:50%;
+  filter:blur(60px);opacity:.5;pointer-events:none;z-index:0;
+  transition:opacity .8s var(--ease);
+}
+.deck::before{width:42vw;height:42vw;top:-16vw;right:-10vw;
+  background:radial-gradient(circle at 30% 30%,rgba(0,201,95,.55),rgba(17,167,228,.18) 60%,transparent 70%);}
+.deck::after{width:36vw;height:36vw;bottom:-14vw;left:-10vw;
+  background:radial-gradient(circle at 60% 40%,rgba(0,215,194,.45),rgba(33,160,56,.12) 60%,transparent 70%);}
+
+/* ---------- SLIDES ---------- */
+.slide{
+  position:absolute;inset:0;z-index:1;
+  display:flex;align-items:center;justify-content:center;
+  padding:clamp(48px,7vh,78px) clamp(28px,5vw,76px) clamp(56px,9vh,92px);
+  opacity:0;transform:translateX(70px) scale(.985);
+  transition:opacity .62s var(--ease),transform .62s var(--ease);
+  pointer-events:none;
+}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.before{opacity:0;transform:translateX(-70px) scale(.985)}
+.slide.after{opacity:0;transform:translateX(70px) scale(.985)}
+
+.inner{
+  width:min(1180px,100%);
+  max-height:100%;
+  overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:thin;scrollbar-color:rgba(33,160,56,.4) transparent;
+  padding:2px;
+}
+.inner::-webkit-scrollbar{width:7px}
+.inner::-webkit-scrollbar-thumb{background:rgba(33,160,56,.35);border-radius:10px}
+
+/* staggered element reveal */
+.slide [data-anim]{
+  opacity:0;transform:translateY(24px);
+  transition:opacity .7s var(--ease),transform .7s var(--ease);
+}
+.slide.active [data-anim]{
+  opacity:1;transform:none;
+  transition-delay:calc(var(--i,0)*68ms + 130ms);
+}
+
+/* ---------- TYPOGRAPHY / SHARED ---------- */
+.kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:clamp(.72rem,1.15vw,.86rem);font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--green-d);
+  padding:8px 16px;border-radius:100px;
+  background:var(--grad-soft);border:1px solid rgba(33,160,56,.18);
+  margin-bottom:clamp(14px,2.4vh,26px);
+}
+.kicker b{color:var(--ink);opacity:.45;font-weight:700}
+h2.title{
+  font-size:clamp(1.7rem,4.2vw,3.1rem);line-height:1.04;font-weight:800;
+  letter-spacing:-.02em;margin-bottom:clamp(16px,3vh,30px);
+}
+.title .grad{
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.lead{font-size:clamp(1rem,1.7vw,1.22rem);color:var(--muted);line-height:1.5;font-weight:500}
+
+/* generic card */
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);padding:clamp(18px,2.5vw,28px);
+}
+
+/* ---------- CHROME ---------- */
+.brand{
+  position:absolute;top:clamp(20px,3.2vh,34px);left:clamp(26px,4vw,52px);
+  z-index:30;display:flex;align-items:center;gap:12px;
+}
+.brand .mark{width:34px;height:34px}
+.brand .wm{font-weight:800;font-size:1.18rem;letter-spacing:-.01em;color:var(--ink)}
+.title-slide ~ .brand{display:flex}
+
+.hud{
+  position:absolute;left:0;right:0;bottom:0;z-index:30;
+  display:flex;align-items:center;gap:18px;
+  padding:0 clamp(26px,4vw,52px) clamp(16px,2.6vh,26px);
+}
+.dots{display:flex;gap:9px;flex:1;flex-wrap:wrap}
+.dot{
+  width:11px;height:11px;border-radius:50%;border:none;cursor:pointer;padding:0;
+  background:rgba(16,40,28,.16);transition:.35s var(--ease);
+}
+.dot:hover{background:rgba(16,40,28,.34)}
+.dot.on{width:30px;border-radius:7px;background:var(--grad)}
+.counter{font-weight:700;font-size:.92rem;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.nav{display:flex;gap:9px}
+.nav button,.fsbtn{
+  width:42px;height:42px;border-radius:13px;border:1px solid var(--line);
+  background:rgba(255,255,255,.8);backdrop-filter:blur(6px);cursor:pointer;
+  display:grid;place-items:center;color:var(--ink);transition:.25s var(--ease);
+}
+.nav button:hover,.fsbtn:hover{background:#fff;transform:translateY(-2px);box-shadow:var(--shadow-sm);color:var(--green-d)}
+.nav button:active{transform:translateY(0)}
+.nav svg,.fsbtn svg{width:19px;height:19px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.fsbtn{position:absolute;top:clamp(20px,3.2vh,34px);right:clamp(26px,4vw,52px);z-index:30}
+
+.bar-track{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(16,40,28,.08);z-index:31}
+.bar-fill{height:100%;width:0;background:var(--grad);transition:width .6s var(--ease);box-shadow:0 0 14px rgba(0,201,95,.5)}
+
+/* dark chrome over the title slide */
+.brand{transition:opacity .4s var(--ease)}
+.on-dark .brand{opacity:0;pointer-events:none}
+.on-dark .counter{color:rgba(255,255,255,.72)}
+.on-dark .dot{background:rgba(255,255,255,.24)}
+.on-dark .dot:hover{background:rgba(255,255,255,.45)}
+.on-dark .nav button,.on-dark .fsbtn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#fff}
+.on-dark .nav button:hover,.on-dark .fsbtn:hover{background:rgba(255,255,255,.22);color:#fff}
+.on-dark .bar-track{background:rgba(255,255,255,.16)}
+
+/* ============================================================
+   SLIDE 1 — TITLE
+   ============================================================ */
+.title-slide{background:#0c1f14;color:#fff}
+.title-slide .bg{
+  position:absolute;inset:0;z-index:0;overflow:hidden;
+  background:
+    radial-gradient(60% 75% at 78% 18%,rgba(0,201,95,.55),transparent 60%),
+    radial-gradient(55% 70% at 18% 88%,rgba(17,167,228,.45),transparent 60%),
+    radial-gradient(45% 60% at 92% 95%,rgba(0,215,194,.4),transparent 60%),
+    linear-gradient(145deg,#0c1f14,#0a2820 55%,#0a1e2c);
+}
+.title-slide .bg .ring{
+  position:absolute;border-radius:50%;border:1.5px solid rgba(255,255,255,.06);
+}
+.title-slide .bg .r1{width:60vw;height:60vw;top:-22vw;right:-14vw}
+.title-slide .bg .r2{width:42vw;height:42vw;top:-12vw;right:-4vw;border-color:rgba(0,215,194,.12)}
+.title-slide .inner{position:relative;z-index:2;text-align:left;overflow:visible}
+.title-mark{width:clamp(88px,11vw,128px);height:clamp(88px,11vw,128px);margin-bottom:clamp(26px,4vh,44px)}
+.t-name{
+  font-size:clamp(4rem,15vw,11rem);font-weight:800;line-height:.92;letter-spacing:-.04em;
+  background:linear-gradient(110deg,#fff 30%,#9ff5cf 70%,#7fd8ff);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:clamp(18px,3vh,30px);
+}
+.t-sub{
+  font-size:clamp(1.15rem,2.8vw,2rem);font-weight:600;line-height:1.28;
+  color:rgba(255,255,255,.92);max-width:20ch;
+}
+.t-rule{height:5px;width:120px;border-radius:5px;background:var(--grad);margin:clamp(22px,3.4vh,34px) 0 clamp(20px,3vh,28px)}
+.t-hint{
+  display:inline-flex;align-items:center;gap:10px;margin-top:clamp(18px,3vh,30px);
+  color:rgba(255,255,255,.66);font-weight:600;font-size:.95rem;
+}
+.t-hint kbd{
+  font-family:inherit;font-size:.82rem;background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:3px 9px;
+}
+.t-hint .arrow{animation:nudge 1.6s var(--ease) infinite}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+
+/* ============================================================
+   SLIDE 2 — СБЕР СЕГОДНЯ
+   ============================================================ */
+.two-col{display:grid;grid-template-columns:1.25fr .9fr;gap:clamp(20px,2.6vw,34px);align-items:start}
+.bullets{display:flex;flex-direction:column;gap:clamp(12px,1.8vh,18px)}
+.bullet{
+  display:flex;gap:15px;align-items:flex-start;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:clamp(14px,1.7vw,18px) clamp(15px,1.8vw,20px);box-shadow:var(--shadow-sm);
+}
+.bullet .ic{
+  flex:none;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  background:var(--grad);color:#fff;box-shadow:0 8px 18px -8px rgba(0,160,80,.6);
+}
+.bullet .ic svg{width:21px;height:21px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.bullet p{font-size:clamp(.96rem,1.4vw,1.1rem);line-height:1.45;font-weight:500}
+.num-stack{display:flex;flex-direction:column;gap:clamp(14px,2vh,18px)}
+.num-card{
+  position:relative;overflow:hidden;color:#fff;border-radius:var(--radius);
+  padding:clamp(18px,2.4vw,26px) clamp(20px,2.6vw,28px);
+  background:var(--grad);box-shadow:var(--shadow);
+}
+.num-card.alt{background:var(--grad-rev)}
+.num-card::after{
+  content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;
+  background:rgba(255,255,255,.14);
+}
+.num-card .n{font-size:clamp(2.1rem,4.4vw,3.2rem);font-weight:800;line-height:1;letter-spacing:-.02em;position:relative}
+.num-card .l{font-size:clamp(.92rem,1.3vw,1.05rem);font-weight:600;opacity:.95;margin-top:8px;position:relative}
+
+.plashka{
+  display:flex;gap:16px;align-items:flex-start;margin-top:clamp(18px,2.6vh,26px);
+  border-radius:var(--radius);padding:clamp(16px,2.2vw,24px) clamp(18px,2.4vw,28px);
+  background:var(--grad-soft);border:1px solid rgba(33,160,56,.2);
+}
+.plashka .pin{
+  flex:none;width:40px;height:40px;border-radius:12px;background:var(--grad);
+  display:grid;place-items:center;box-shadow:0 8px 18px -8px rgba(0,160,80,.6);
+}
+.plashka .pin svg{width:22px;height:22px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.plashka p{font-size:clamp(1rem,1.55vw,1.2rem);font-weight:600;line-height:1.42;color:var(--ink)}
+.plashka p b{color:var(--green-d)}
+
+/* ============================================================
+   SLIDE 3 — СТЕЙКХОЛДЕРЫ  / SLIDE 8 tools / generic grid
+   ============================================================ */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,1.8vw,22px)}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(14px,1.8vw,22px)}
+.stake{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:clamp(16px,2vw,24px);box-shadow:var(--shadow-sm);
+  display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;
+  transition:.4s var(--ease);
+}
+.slide.active .stake{transition-delay:.1s}
+.stake::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--grad);
+  opacity:.0;transition:.4s var(--ease);
+}
+.stake:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.stake:hover::before{opacity:1}
+.stake .badge{
+  width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+  background:var(--grad);box-shadow:0 10px 22px -10px rgba(0,160,80,.7);
+}
+.stake .badge svg{width:25px;height:25px;stroke:#fff;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.stake h3{font-size:clamp(1.02rem,1.55vw,1.25rem);font-weight:800;letter-spacing:-.01em}
+.stake p{font-size:clamp(.88rem,1.25vw,1.02rem);color:var(--muted);line-height:1.42;font-weight:500}
+
+/* ============================================================
+   SLIDE 4 — ЧЕГО ЖДУТ
+   ============================================================ */
+.expect{display:flex;flex-direction:column;gap:clamp(10px,1.5vh,14px)}
+.erow{
+  display:grid;grid-template-columns:minmax(180px,260px) 1fr;gap:clamp(14px,2vw,26px);
+  align-items:center;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:clamp(13px,1.7vw,18px) clamp(16px,2vw,24px);box-shadow:var(--shadow-sm);
+}
+.erow .who{display:flex;align-items:center;gap:13px}
+.erow .who .ic{
+  flex:none;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;
+  background:var(--grad-soft);border:1px solid rgba(33,160,56,.2);
+}
+.erow .who .ic svg{width:22px;height:22px;stroke:var(--green-d);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.erow .who span{font-weight:800;font-size:clamp(.98rem,1.4vw,1.14rem)}
+.erow .want{font-size:clamp(.92rem,1.35vw,1.08rem);color:var(--muted);line-height:1.4;font-weight:500}
+
+/* ============================================================
+   SLIDE 5 — ТРИ ПРОБЛЕМЫ
+   ============================================================ */
+.prob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2vw,24px)}
+.prob{
+  position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:clamp(22px,2.6vw,32px);box-shadow:var(--shadow-sm);overflow:hidden;
+  display:flex;flex-direction:column;gap:14px;transition:.4s var(--ease);
+}
+.prob:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.prob .pn{
+  font-size:clamp(2.6rem,5vw,3.8rem);font-weight:800;line-height:.8;letter-spacing:-.04em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.prob h3{font-size:clamp(1.1rem,1.7vw,1.4rem);font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.prob p{font-size:clamp(.92rem,1.3vw,1.05rem);color:var(--muted);line-height:1.45;font-weight:500}
+.prob::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--grad)}
+
+/* ============================================================
+   SLIDE 6 — ПРОБЛЕМЫ 1 и 2
+   ============================================================ */
+.pcols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.2vw,28px);align-items:stretch}
+.pcard{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);padding:clamp(20px,2.4vw,28px);
+  display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden;
+}
+.pcard .head{display:flex;align-items:center;gap:14px}
+.pcard .head .ic{
+  flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;
+  background:var(--grad);box-shadow:0 10px 22px -10px rgba(0,160,80,.7);
+}
+.pcard .head .ic svg{width:26px;height:26px;stroke:#fff;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.pcard .head .tag{font-size:.74rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--green-d)}
+.pcard .head h3{font-size:clamp(1.08rem,1.6vw,1.32rem);font-weight:800;letter-spacing:-.01em;line-height:1.1}
+.li{display:flex;gap:11px;align-items:flex-start;font-size:clamp(.92rem,1.3vw,1.06rem);line-height:1.44;font-weight:500}
+.li .mk{flex:none;width:7px;height:7px;border-radius:50%;background:var(--grad);margin-top:.55em}
+.li.who{font-weight:600}
+.li.who .mk{background:#9fb3aa}
+.li.risk{
+  background:rgba(229,72,72,.07);border:1px solid rgba(229,72,72,.18);border-radius:12px;
+  padding:11px 14px;font-weight:600;color:#9c2b2b;
+}
+.li.risk .mk{background:#e05656}
+.li b{font-weight:800;color:var(--ink)}
+
+/* ============================================================
+   SLIDE 7 — ПРОБЛЕМА 3 + РЕШЕНИЕ
+   ============================================================ */
+.s7{display:grid;grid-template-columns:.92fr 1.08fr;gap:clamp(16px,2.2vw,28px);align-items:start}
+.solve-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.solve-head .ic{flex:none;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:var(--grad);box-shadow:0 10px 22px -10px rgba(0,160,80,.7)}
+.solve-head .ic svg{width:24px;height:24px;stroke:#fff;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.solve-head h3{font-size:clamp(1.05rem,1.55vw,1.28rem);font-weight:800;letter-spacing:-.01em}
+.numrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.numrow .num-card{padding:clamp(15px,2vw,22px) clamp(16px,2.1vw,22px)}
+.numrow .num-card .n{font-size:clamp(1.6rem,3.4vw,2.5rem)}
+.msg-plashka{
+  margin-top:14px;border-radius:var(--r-sm);padding:14px 18px;color:#fff;
+  background:var(--grad);box-shadow:var(--shadow);font-weight:700;
+  font-size:clamp(1rem,1.5vw,1.18rem);line-height:1.35;display:flex;gap:12px;align-items:center;
+}
+.msg-plashka svg{flex:none;width:24px;height:24px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* ============================================================
+   SLIDE 8 — ИНСТРУМЕНТЫ
+   ============================================================ */
+.tool{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);padding:clamp(18px,2.2vw,26px);
+  display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden;
+  transition:.4s var(--ease);
+}
+.tool:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.tool .th{display:flex;align-items:center;gap:13px}
+.tool .th .ic{flex:none;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:var(--grad);box-shadow:0 10px 22px -10px rgba(0,160,80,.7)}
+.tool .th .ic svg{width:24px;height:24px;stroke:#fff;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tool h3{font-size:clamp(1.04rem,1.5vw,1.26rem);font-weight:800;letter-spacing:-.01em;line-height:1.1}
+.tool p{font-size:clamp(.9rem,1.3vw,1.05rem);color:var(--muted);line-height:1.5;font-weight:500}
+
+/* ============================================================
+   SLIDES 9 & 10 — ФЛАГМАНЫ
+   ============================================================ */
+.flag{display:grid;grid-template-columns:1.55fr 1fr;gap:clamp(16px,2.4vw,30px);align-items:stretch}
+.flag .main{display:flex;flex-direction:column;gap:clamp(11px,1.6vh,15px)}
+.frow{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:clamp(13px,1.7vw,18px) clamp(15px,1.9vw,21px);box-shadow:var(--shadow-sm);
+}
+.frow .ic{flex:none;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:var(--grad-soft);border:1px solid rgba(33,160,56,.2)}
+.frow .ic svg{width:22px;height:22px;stroke:var(--green-d);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.frow p{font-size:clamp(.92rem,1.32vw,1.07rem);line-height:1.44;font-weight:500}
+.frow p b{font-weight:800;color:var(--ink)}
+.sidepanel{
+  position:relative;overflow:hidden;color:#fff;border-radius:var(--radius);
+  background:linear-gradient(160deg,#0e7a33,#0a6a4f 55%,#0b5570);
+  box-shadow:var(--shadow);padding:clamp(20px,2.6vw,30px);
+  display:flex;flex-direction:column;gap:16px;justify-content:center;
+}
+.sidepanel::before{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.08)}
+.sidepanel::after{content:"";position:absolute;left:-30px;bottom:-40px;width:130px;height:130px;border-radius:50%;background:rgba(0,215,194,.18)}
+.sidepanel .sp-label{font-size:.74rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);position:relative}
+.sidepanel p{font-size:clamp(1rem,1.5vw,1.2rem);line-height:1.45;font-weight:600;position:relative}
+.sidepanel p b{color:#9ff5cf}
+.statline{display:flex;flex-direction:column;gap:14px;position:relative}
+.stat .sv{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:800;line-height:1;background:linear-gradient(110deg,#fff,#9ff5cf);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat .sl{font-size:.92rem;font-weight:600;color:rgba(255,255,255,.82);margin-top:5px}
+.sp-divider{height:1px;background:rgba(255,255,255,.16);position:relative}
+
+/* ============================================================
+   SLIDE 11 — ИСЧИСЛЕНИЕ РЕЗУЛЬТАТА
+   ============================================================ */
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(15px,2vw,24px)}
+.metric{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);padding:clamp(20px,2.5vw,30px);
+  display:flex;gap:18px;align-items:flex-start;position:relative;overflow:hidden;
+  transition:.4s var(--ease);
+}
+.metric:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.metric .mic{flex:none;width:54px;height:54px;border-radius:15px;display:grid;place-items:center;background:var(--grad);box-shadow:0 12px 24px -10px rgba(0,160,80,.7)}
+.metric .mic svg{width:28px;height:28px;stroke:#fff;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.metric h3{font-size:clamp(1.1rem,1.7vw,1.4rem);font-weight:800;letter-spacing:-.01em;margin-bottom:7px}
+.metric p{font-size:clamp(.92rem,1.32vw,1.08rem);color:var(--muted);line-height:1.46;font-weight:500}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:920px){
+  .two-col,.s7,.flag{grid-template-columns:1fr}
+  .grid3,.prob-grid{grid-template-columns:1fr}
+  .pcols,.grid2,.metrics{grid-template-columns:1fr}
+  .erow{grid-template-columns:1fr;gap:8px}
+  .t-sub{max-width:none}
+}
+@media (max-width:560px){
+  .numrow{grid-template-columns:1fr}
+  .counter{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .slide,.slide [data-anim]{transition-duration:.001s!important}
+  .t-hint .arrow{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ============ SLIDE 1 — ТИТУЛ ============ -->
+  <section class="slide title-slide" data-bg="dark">
+    <div class="bg"><span class="ring r1"></span><span class="ring r2"></span></div>
+    <div class="inner">
+      <svg class="title-mark" data-anim viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+          <linearGradient id="tg" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%" stop-color="#1A9F29"/><stop offset="38%" stop-color="#00C95F"/>
+            <stop offset="68%" stop-color="#00D7C2"/><stop offset="100%" stop-color="#11A7E4"/>
+          </linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r="35" fill="none" stroke="url(#tg)" stroke-width="10"
+                stroke-linecap="round" stroke-dasharray="165 55"/>
+        <path d="M34 50 L46 61 L74 30" fill="none" stroke="url(#tg)" stroke-width="10"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1 class="t-name" data-anim>Сбер</h1>
+      <div class="t-rule" data-anim></div>
+      <p class="t-sub" data-anim>Стейкхолдеры, коммуникационные проблемы и&nbsp;PR-решения</p>
+      <div class="t-hint" data-anim>
+        <span>Листайте</span>
+        <kbd>→</kbd><kbd>Space</kbd>
+        <span class="arrow">→</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 2 — СБЕР СЕГОДНЯ ============ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="kicker" data-anim><span>Сбер сегодня</span> · <b>02</b></div>
+      <h2 class="title" data-anim>Сбер <span class="grad">сегодня</span></h2>
+      <div class="two-col">
+        <div class="bullets">
+          <div class="bullet" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <p>Крупнейший банк страны. Целая экосистема сервисов — финансы, торговля, доставка, здоровье, развлечения, не просто госбанк.</p>
+          </div>
+          <div class="bullet" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 1.5v3M15 1.5v3M9 19.5v3M15 19.5v3M1.5 9h3M1.5 15h3M19.5 9h3M19.5 15h3"/></svg></span>
+            <p>Опора новой идентичности — искусственный интеллект и собственная модель GigaChat.</p>
+          </div>
+          <div class="bullet" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18"/></svg></span>
+            <p>С 2022 года под санкциями; фокус сместился на внутренний рынок и дружественные страны.</p>
+          </div>
+        </div>
+        <div class="num-stack">
+          <div class="num-card" data-anim><div class="n">111 млн</div><div class="l">Активных клиентов</div></div>
+          <div class="num-card alt" data-anim><div class="n">≈3,5 млн</div><div class="l">Компаний-клиентов</div></div>
+        </div>
+      </div>
+      <div class="plashka" data-anim>
+        <span class="pin"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.2L12 16.8 5.7 21l2.3-7.2-6-4.4h7.6L12 2Z"/></svg></span>
+        <p><b>Сберкасса осталась в прошлом</b> — сейчас это полноценная экосистема. Но восприятие за этим сдвигом не поспевает.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 3 — СТЕЙКХОЛДЕРЫ ============ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="kicker" data-anim><span>Стейкхолдеры</span> · <b>03</b></div>
+      <h2 class="title" data-anim>Карта <span class="grad">стейкхолдеров</span> Сбера</h2>
+      <div class="grid3">
+        <div class="stake" data-anim>
+          <span class="badge"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5M5 9v8M9 9v8M15 9v8M19 9v8M3 21h18"/></svg></span>
+          <h3>Государство как акционер и регуляторы</h3>
+          <p>Банк России, законодатели</p>
+        </div>
+        <div class="stake" data-anim>
+          <span class="badge"><svg viewBox="0 0 24 24"><path d="M3 17l5-5 4 3 8-8M21 6v5M21 6h-5"/></svg></span>
+          <h3>Инвесторы</h3>
+          <p>Миноритарии, институциональные держатели</p>
+        </div>
+        <div class="stake" data-anim>
+          <span class="badge"><svg viewBox="0 0 24 24"><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.87M16 4.13A4 4 0 0 1 16 11.87"/></svg></span>
+          <h3>Клиенты</h3>
+          <p>Розница, малый и средний бизнес, корпорации</p>
+        </div>
+        <div class="stake" data-anim>
+          <span class="badge"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="10" r="2.4"/><path d="M8 17a4 4 0 0 1 8 0"/></svg></span>
+          <h3>Сотрудники и кадры</h3>
+          <p>Персонал, менеджмент, потенциальные сотрудники</p>
+        </div>
+        <div class="stake" data-anim>
+          <span class="badge"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg></span>
+          <h3>Партнёры</h3>
+          <p>Компании экосистемы, поставщики, техпартнёры</p>
+        </div>
+        <div class="stake" data-anim>
+          <span class="badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18"/></svg></span>
+          <h3>Общество и медиа</h3>
+          <p>Регионы, НКО, профсообщество, СМИ</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 4 — ЧЕГО ЖДУТ ============ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="kicker" data-anim><span>Ожидания групп</span> · <b>04</b></div>
+      <h2 class="title" data-anim>Чего ждут <span class="grad">ключевые группы</span></h2>
+      <div class="expect">
+        <div class="erow" data-anim>
+          <div class="who"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5M5 9v8M9 9v8M15 9v8M19 9v8M3 21h18"/></svg></span><span>Регулятор и государство</span></div>
+          <div class="want">Устойчивость, соблюдение норм, вклад в экономику и создание технического суверенитета</div>
+        </div>
+        <div class="erow" data-anim>
+          <div class="who"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 17l5-5 4 3 8-8M21 6v5M21 6h-5"/></svg></span><span>Инвесторы</span></div>
+          <div class="want">Прозрачность, предсказуемость, рост стоимости</div>
+        </div>
+        <div class="erow" data-anim>
+          <div class="who"><span class="ic"><svg viewBox="0 0 24 24"><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.87"/></svg></span><span>Клиенты</span></div>
+          <div class="want">выгодная экономическая политика, надёжность, удобство.</div>
+        </div>
+        <div class="erow" data-anim>
+          <div class="who"><span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="10" r="2.4"/><path d="M8 17a4 4 0 0 1 8 0"/></svg></span><span>Сотрудники</span></div>
+          <div class="want">стабильная работа, развитие, репутация как работодателя</div>
+        </div>
+        <div class="erow" data-anim>
+          <div class="who"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18"/></svg></span><span>Общество</span></div>
+          <div class="want">Безопасность, доступность услуг, ответственность бизнеса</div>
+        </div>
+      </div>
+      <div class="plashka" data-anim>
+        <span class="pin"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg></span>
+        <p>Интересы расходятся — например, быстрое внедрение ИИ против тревоги за данные. <b>На стыках такого рода и возникают коммуникационные проблемы.</b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 5 — ТРИ ПРОБЛЕМЫ ============ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="kicker" data-anim><span>Диагноз</span> · <b>05</b></div>
+      <h2 class="title" data-anim>Три <span class="grad">коммуникационные</span> проблемы</h2>
+      <div class="prob-grid">
+        <div class="prob" data-anim>
+          <div class="pn">01</div>
+          <h3>Разрыв в восприятии</h3>
+          <p>«Привычный госбанк» стал целой экосистемой.</p>
+        </div>
+        <div class="prob" data-anim>
+          <div class="pn">02</div>
+          <h3>Доверие и безопасность</h3>
+          <p>Мошенничество и настороженность к данным и ИИ бьют по доверию.</p>
+        </div>
+        <div class="prob" data-anim>
+          <div class="pn">03</div>
+          <h3>«Госбанк на господдержке»</h3>
+          <p>Мнение, что успех Сбера держится на привилегиях, а не на эффективности.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 6 — ПРОБЛЕМЫ 1 и 2 ============ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="kicker" data-anim><span>Проблемы 1 и 2</span> · <b>06</b></div>
+      <h2 class="title" data-anim>Восприятие <span class="grad">и доверие</span></h2>
+      <div class="pcols">
+        <div class="pcard" data-anim>
+          <div class="head">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            <div><div class="tag">Проблема 1</div><h3>Разрыв в восприятии</h3></div>
+          </div>
+          <div class="li"><span class="mk"></span><span>Сбер вкладывается в ИИ, но в массовом сознании остаётся «Сбербанком» — банком по старой привычке.</span></div>
+          <div class="li"><span class="mk"></span><span>Реальная идентичность опережает репутацию.</span></div>
+          <div class="li who"><span class="mk"></span><span><b>Кого касается:</b> Общество, IT-сообщество, инвесторы, кандидаты.</span></div>
+        </div>
+        <div class="pcard" data-anim>
+          <div class="head">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-3Z"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <div><div class="tag">Проблема 2</div><h3>Доверие и безопасность</h3></div>
+          </div>
+          <div class="li"><span class="mk"></span><span>Телефонное мошенничество растёт; потеряв деньги, человек нередко винит банк.</span></div>
+          <div class="li"><span class="mk"></span><span>Рядом — тревога вокруг обработки данных и ИИ.</span></div>
+          <div class="li who"><span class="mk"></span><span><b>Кого касается:</b> Розничные клиенты, регулятор, общество.</span></div>
+          <div class="li risk"><span class="mk"></span><span><b>Риск:</b> Подрывается главный актив банка — доверие.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 7 — ПРОБЛЕМА 3 + РЕШЕНИЕ ============ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="kicker" data-anim><span>Проблема 3 и решение</span> · <b>07</b></div>
+      <h2 class="title" data-anim>Вклад <span class="grad">в бюджет</span></h2>
+      <div class="s7">
+        <div class="pcard" data-anim>
+          <div class="head">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v18M6 21h12M5 7h14M5 7l-3 6a3 3 0 0 0 6 0L5 7ZM19 7l-3 6a3 3 0 0 0 6 0L19 7Z"/></svg></span>
+            <div><div class="tag">Проблема 3</div><h3>«Госбанк на господдержке»</h3></div>
+          </div>
+          <div class="li"><span class="mk"></span><span><b>Мнение:</b> Сбер силён не эффективностью, а госстатусом — поддержкой, близостью к власти.</span></div>
+          <div class="li who"><span class="mk"></span><span><b>Кого касается:</b> Общество, деловое и экспертное сообщество.</span></div>
+          <div class="li risk"><span class="mk"></span><span><b>Риск:</b> Достижения обесцениваются, представляются «нерыночными».</span></div>
+          <div class="msg-plashka">
+            <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+            <span>Не государство содержит Сбер — Сбер наполняет бюджет.</span>
+          </div>
+        </div>
+        <div data-anim>
+          <div class="solve-head">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+            <h3>Решение: продемонстрировать вклад в экономику</h3>
+          </div>
+          <div class="numrow">
+            <div class="num-card"><div class="n">1,3 трлн ₽</div><div class="l">Вклад в бюджет за 2025 год</div></div>
+            <div class="num-card alt"><div class="n">543 млрд ₽</div><div class="l">Из них налог на прибыль</div></div>
+          </div>
+          <div class="pcard" style="gap:11px">
+            <div class="li"><span class="mk"></span><span><b>Рыночный успех, а не только статус:</b> самая дорогая компания на бирже, лидер по внедрению ИИ в России, одно из лучших соотношений расходов к доходам.</span></div>
+            <div class="li"><span class="mk"></span><span><b>Инструменты:</b> годовой отчёт и МСФО, деловые СМИ, выступления топ-менеджмента, инфографика о вкладе в экономику, IR / GR.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 8 — ИНСТРУМЕНТЫ ============ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="kicker" data-anim><span>Инструменты</span> · <b>08</b></div>
+      <h2 class="title" data-anim>Инструменты под <span class="grad">каждую проблему</span></h2>
+      <div class="grid3">
+        <div class="tool" data-anim>
+          <div class="th">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            <h3>Восприятие</h3>
+          </div>
+          <p>Экспертные публикации и выступления, профильные СМИ, конференция AI Journey, узнаваемые спикеры</p>
+        </div>
+        <div class="tool" data-anim>
+          <div class="th">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-3Z"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <h3>Доверие</h3>
+          </div>
+          <p>Просвещение по фин- и цифровой грамотности, протоколы реагирования на инциденты, открытый разговор о защите данных, партнёрство с государством и НКО</p>
+        </div>
+        <div class="tool" data-anim>
+          <div class="th">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v18M6 21h12M5 7h14M5 7l-3 6a3 3 0 0 0 6 0L5 7ZM19 7l-3 6a3 3 0 0 0 6 0L19 7Z"/></svg></span>
+            <h3>«Госбанк на господдержке»</h3>
+          </div>
+          <p>Факты о вкладе в бюджет, годовой отчёт и МСФО, деловые СМИ, инфографика об экономическом вкладе, IR / GR</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 9 — ФЛАГМАН 1: AI JOURNEY ============ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="kicker" data-anim><span>Флагман 1</span> · <b>09</b></div>
+      <h2 class="title" data-anim>Конференция <span class="grad">AI Journey</span></h2>
+      <div class="flag">
+        <div class="main">
+          <div class="frow" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+            <p><b>Формат:</b> Ежегодная международная конференция по ИИ — научный, деловой и образовательный треки, открытая онлайн-трансляция, конкурсы для разработчиков.</p>
+          </div>
+          <div class="frow" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 1.5v3M15 1.5v3M9 19.5v3M15 19.5v3M1.5 9h3M1.5 15h3M19.5 9h3M19.5 15h3"/></svg></span>
+            <p><b>Роль площадки:</b> На AI Journey Сбер представляет новые версии GigaChat — событие работает как витрина технологий.</p>
+          </div>
+          <div class="frow" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.87"/></svg></span>
+            <p><b>На кого:</b> Разработчики и учёные, IT-сообщество, медиа, частично государство и инвесторы.</p>
+          </div>
+          <div class="frow" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.2L12 16.8 5.7 21l2.3-7.2-6-4.4h7.6L12 2Z"/></svg></span>
+            <p><b>Зачем:</b> Закрепить образ техлидера, показать зрелость GigaChat и научной школы, повысить доверие к российскому ИИ.</p>
+          </div>
+        </div>
+        <aside class="sidepanel" data-anim>
+          <span class="sp-label">Что закрывает</span>
+          <p>Закрывает проблему <b>№1 — Восприятие</b>; отчасти <b>№2 — Доверие к ИИ</b>.</p>
+          <div class="sp-divider"></div>
+          <p>Показывает, что Сбер конкурирует на технологиях.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 10 — ФЛАГМАН 2: СБЕРУНИВЕРСИТЕТ ============ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="kicker" data-anim><span>Флагман 2</span> · <b>10</b></div>
+      <h2 class="title" data-anim><span class="grad">СберУниверситет</span></h2>
+      <div class="flag">
+        <div class="main">
+          <div class="frow" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M3 9l9-4 9 4-9 4-9-4ZM7 11v5c0 1 2.5 3 5 3s5-2 5-3v-5"/></svg></span>
+            <p><b>Формат:</b> Корпоративный университет с кампусом в Истре — программы для сотрудников и руководителей плюс открытые форматы.</p>
+          </div>
+          <div class="frow" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg></span>
+            <p><b>Публичное событие:</b> Ежегодная конференция «Больше чем обучение».</p>
+          </div>
+          <div class="frow" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.87"/></svg></span>
+            <p><b>На кого:</b> Внутри — сотрудники и менеджмент; снаружи — кандидаты, студенты и вузы, профсообщество, медиа.</p>
+          </div>
+          <div class="frow" data-anim>
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.2L12 16.8 5.7 21l2.3-7.2-6-4.4h7.6L12 2Z"/></svg></span>
+            <p><b>Зачем:</b> Усилить репутацию работодателя, показать экспертизу в образовании и управлении.</p>
+          </div>
+        </div>
+        <aside class="sidepanel" data-anim>
+          <div class="statline">
+            <div class="stat"><div class="sv">≈10 000</div><div class="sl">участников очно и онлайн</div></div>
+            <div class="sp-divider"></div>
+            <div class="stat"><div class="sv">4 млн+</div><div class="sl">просмотров трансляции</div></div>
+            <div class="sp-divider"></div>
+            <div class="stat"><div class="sv">50+</div><div class="sl">спикеров</div></div>
+          </div>
+          <div class="sp-divider"></div>
+          <p>Закрывает проблему <b>№1 — Восприятие</b>.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 11 — ИСЧИСЛЕНИЕ РЕЗУЛЬТАТА ============ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="kicker" data-anim><span>Метрики</span> · <b>11</b></div>
+      <h2 class="title" data-anim>Исчисление <span class="grad">результата</span></h2>
+      <div class="metrics">
+        <div class="metric" data-anim>
+          <span class="mic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg></span>
+          <div><h3>Медиа</h3><p>Число и тональность упоминаний; доля «технологического» сюжета в публикациях</p></div>
+        </div>
+        <div class="metric" data-anim>
+          <span class="mic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-3Z"/><path d="M9 12l2 2 4-4"/></svg></span>
+          <div><h3>Доверие</h3><p>Опросы восприятия (банк против экосистемы); тема безопасности</p></div>
+        </div>
+        <div class="metric" data-anim>
+          <span class="mic"><svg viewBox="0 0 24 24"><path d="M12 3v18M6 21h12M5 7h14M5 7l-3 6a3 3 0 0 0 6 0L5 7ZM19 7l-3 6a3 3 0 0 0 6 0L19 7Z"/></svg></span>
+          <div><h3>Легитимность</h3><p>Доля публикаций, где Сбер показан как вкладчик в бюджет и рыночный игрок</p></div>
+        </div>
+        <div class="metric" data-anim>
+          <span class="mic"><svg viewBox="0 0 24 24"><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.87M16 4.13A4 4 0 0 1 16 11.87"/></svg></span>
+          <div><h3>Охваты</h3><p>Аудитория ключевых событий: AI Journey и «Больше чем обучение»</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHROME ============ -->
+  <div class="brand" aria-hidden="true">
+    <svg class="mark" viewBox="0 0 100 100">
+      <defs>
+        <linearGradient id="bg2" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stop-color="#1A9F29"/><stop offset="38%" stop-color="#00C95F"/>
+          <stop offset="68%" stop-color="#00D7C2"/><stop offset="100%" stop-color="#11A7E4"/>
+        </linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="35" fill="none" stroke="url(#bg2)" stroke-width="11" stroke-linecap="round" stroke-dasharray="165 55"/>
+      <path d="M34 50 L46 61 L74 30" fill="none" stroke="url(#bg2)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="wm">Сбер</span>
+  </div>
+
+  <button class="fsbtn" id="fs" title="Полный экран (F)" aria-label="Полный экран">
+    <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+  </button>
+
+  <div class="hud">
+    <div class="dots" id="dots"></div>
+    <div class="counter" id="counter">01 / 11</div>
+    <div class="nav">
+      <button id="prev" aria-label="Назад"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button id="next" aria-label="Вперёд"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+  <div class="bar-track"><div class="bar-fill" id="bar"></div></div>
+
+</div>
+
+<script>
+(function(){
+  var deck=document.getElementById('deck');
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var dotsWrap=document.getElementById('dots');
+  var counter=document.getElementById('counter');
+  var bar=document.getElementById('bar');
+  var cur=0, N=slides.length;
+
+  // stagger index per slide
+  slides.forEach(function(s){
+    var items=s.querySelectorAll('[data-anim]');
+    [].forEach.call(items,function(el,i){ el.style.setProperty('--i', i); });
+  });
+
+  // dots
+  slides.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.className='dot'; b.type='button';
+    b.setAttribute('aria-label','Слайд '+(i+1));
+    b.addEventListener('click',function(){ go(i); });
+    dotsWrap.appendChild(b);
+  });
+  var dots=[].slice.call(dotsWrap.children);
+
+  function pad(n){ return (n<10?'0':'')+n; }
+
+  function render(){
+    slides.forEach(function(s,i){
+      s.classList.toggle('active', i===cur);
+      s.classList.toggle('before', i<cur);
+      s.classList.toggle('after', i>cur);
+      s.setAttribute('aria-hidden', i===cur ? 'false':'true');
+      // reset scroll on reveal
+      if(i===cur){ var inner=s.querySelector('.inner'); if(inner) inner.scrollTop=0; }
+    });
+    dots.forEach(function(d,i){ d.classList.toggle('on', i===cur); });
+    counter.textContent=pad(cur+1)+' / '+pad(N);
+    bar.style.width=((cur+1)/N*100)+'%';
+    // dark chrome on title slide
+    document.body.classList.toggle('on-dark', slides[cur].classList.contains('title-slide'));
+  }
+
+  function go(i){
+    i=Math.max(0,Math.min(N-1,i));
+    if(i===cur) return;
+    cur=i; render();
+  }
+  function next(){ go(cur+1); }
+  function prev(){ go(cur-1); }
+
+  document.getElementById('next').addEventListener('click',next);
+  document.getElementById('prev').addEventListener('click',prev);
+
+  window.addEventListener('keydown',function(e){
+    var k=e.key;
+    if(k==='ArrowRight'||k==='ArrowDown'||k==='PageDown'||k===' '||k==='Spacebar'){ e.preventDefault(); next(); }
+    else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'){ e.preventDefault(); prev(); }
+    else if(k==='Home'){ e.preventDefault(); go(0); }
+    else if(k==='End'){ e.preventDefault(); go(N-1); }
+    else if(k==='f'||k==='F'){ toggleFs(); }
+  });
+
+  // touch swipe
+  var tx=0,ty=0;
+  deck.addEventListener('touchstart',function(e){ tx=e.changedTouches[0].clientX; ty=e.changedTouches[0].clientY; },{passive:true});
+  deck.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)){ dx<0?next():prev(); }
+  },{passive:true});
+
+  function toggleFs(){
+    if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){})(); }
+    else { (document.exitFullscreen||function(){})(); }
+  }
+  document.getElementById('fs').addEventListener('click',toggleFs);
+
+  // initial paint -> trigger entrance animation
+  requestAnimationFrame(function(){ requestAnimationFrame(render); });
+})();
+</script>
+</body>
+</html>
