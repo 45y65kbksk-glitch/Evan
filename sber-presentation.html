@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#0c1f14" />
 <title>Сбер — Стейкхолдеры, коммуникационные проблемы и PR-решения</title>
+<script>document.documentElement.classList.add('js');</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,56 +38,57 @@ body{
   font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   background:#0c1f14;
   color:var(--ink);
-  overflow:hidden;
+  overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
 }
 
-/* ---------- DECK ---------- */
-.deck{
-  position:fixed;inset:0;
-  background:var(--bg);
-  overflow:hidden;
-}
-/* decorative gradient blobs on light slides */
+/* ---------- DECK ----------
+   Base styles = NO-JS / fallback: a clean, fully-readable scrollable
+   document (every slide visible, stacked). The animated single-screen
+   deck is layered on top only when the <html> element has class "js".   */
+.deck{position:relative;background:var(--bg);}
 .deck::before,.deck::after{
-  content:"";position:absolute;border-radius:50%;
+  content:"";position:fixed;border-radius:50%;
   filter:blur(60px);opacity:.5;pointer-events:none;z-index:0;
-  transition:opacity .8s var(--ease);
 }
 .deck::before{width:42vw;height:42vw;top:-16vw;right:-10vw;
   background:radial-gradient(circle at 30% 30%,rgba(0,201,95,.55),rgba(17,167,228,.18) 60%,transparent 70%);}
 .deck::after{width:36vw;height:36vw;bottom:-14vw;left:-10vw;
   background:radial-gradient(circle at 60% 40%,rgba(0,215,194,.45),rgba(33,160,56,.12) 60%,transparent 70%);}
 
-/* ---------- SLIDES ---------- */
 .slide{
-  position:absolute;inset:0;z-index:1;
+  position:relative;z-index:1;min-height:100vh;
   display:flex;align-items:center;justify-content:center;
   padding:clamp(48px,7vh,78px) clamp(28px,5vw,76px) clamp(56px,9vh,92px);
+}
+.inner{width:min(1180px,100%);padding:2px;}
+.inner::-webkit-scrollbar{width:7px}
+.inner::-webkit-scrollbar-thumb{background:rgba(33,160,56,.35);border-radius:10px}
+
+/* ---------- JS-ENHANCED DECK ---------- */
+html.js,html.js body{height:100%;overflow:hidden;}
+html.js .deck{position:fixed;inset:0;overflow:hidden;}
+html.js .deck::before,html.js .deck::after{position:absolute;transition:opacity .8s var(--ease);}
+html.js .slide{
+  position:absolute;inset:0;min-height:0;
   opacity:0;transform:translateX(70px) scale(.985);
   transition:opacity .62s var(--ease),transform .62s var(--ease);
   pointer-events:none;
 }
-.slide.active{opacity:1;transform:none;pointer-events:auto}
-.slide.before{opacity:0;transform:translateX(-70px) scale(.985)}
-.slide.after{opacity:0;transform:translateX(70px) scale(.985)}
-
-.inner{
-  width:min(1180px,100%);
-  max-height:100%;
-  overflow-y:auto;overflow-x:hidden;
+html.js .slide.active{opacity:1;transform:none;pointer-events:auto}
+html.js .slide.before{opacity:0;transform:translateX(-70px) scale(.985)}
+html.js .slide.after{opacity:0;transform:translateX(70px) scale(.985)}
+html.js .inner{
+  max-height:100%;overflow-y:auto;overflow-x:hidden;
   scrollbar-width:thin;scrollbar-color:rgba(33,160,56,.4) transparent;
-  padding:2px;
 }
-.inner::-webkit-scrollbar{width:7px}
-.inner::-webkit-scrollbar-thumb{background:rgba(33,160,56,.35);border-radius:10px}
 
-/* staggered element reveal */
-.slide [data-anim]{
+/* staggered element reveal (only inside the JS deck) */
+html.js .slide [data-anim]{
   opacity:0;transform:translateY(24px);
   transition:opacity .7s var(--ease),transform .7s var(--ease);
 }
-.slide.active [data-anim]{
+html.js .slide.active [data-anim]{
   opacity:1;transform:none;
   transition-delay:calc(var(--i,0)*68ms + 130ms);
 }
@@ -141,7 +143,7 @@ h2.title{
 .nav{display:flex;gap:9px}
 .nav button,.fsbtn{
   width:42px;height:42px;border-radius:13px;border:1px solid var(--line);
-  background:rgba(255,255,255,.8);backdrop-filter:blur(6px);cursor:pointer;
+  background:rgba(255,255,255,.8);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);cursor:pointer;
   display:grid;place-items:center;color:var(--ink);transition:.25s var(--ease);
 }
 .nav button:hover,.fsbtn:hover{background:#fff;transform:translateY(-2px);box-shadow:var(--shadow-sm);color:var(--green-d)}
@@ -161,6 +163,12 @@ h2.title{
 .on-dark .nav button,.on-dark .fsbtn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#fff}
 .on-dark .nav button:hover,.on-dark .fsbtn:hover{background:rgba(255,255,255,.22);color:#fff}
 .on-dark .bar-track{background:rgba(255,255,255,.16)}
+
+/* in static fallback (no JS) the interactive chrome is useless -> hide it */
+html:not(.js) .hud,
+html:not(.js) .fsbtn,
+html:not(.js) .bar-track,
+html:not(.js) .brand{display:none}
 
 /* ============================================================
    SLIDE 1 — TITLE
@@ -440,7 +448,7 @@ h2.title{
 <div class="deck" id="deck">
 
   <!-- ============ SLIDE 1 — ТИТУЛ ============ -->
-  <section class="slide title-slide" data-bg="dark">
+  <section class="slide title-slide active" data-bg="dark">
     <div class="bg"><span class="ring r1"></span><span class="ring r2"></span></div>
     <div class="inner">
       <svg class="title-mark" data-anim viewBox="0 0 100 100" aria-hidden="true">
@@ -826,83 +834,91 @@ h2.title{
 
 <script>
 (function(){
-  var deck=document.getElementById('deck');
-  var slides=[].slice.call(document.querySelectorAll('.slide'));
-  var dotsWrap=document.getElementById('dots');
-  var counter=document.getElementById('counter');
-  var bar=document.getElementById('bar');
-  var cur=0, N=slides.length;
+  var H=document.documentElement;
+  H.classList.add('js'); // ensure deck mode even if the <head> snippet was skipped
+  try{
+    var deck=document.getElementById('deck');
+    var slides=[].slice.call(document.querySelectorAll('.slide'));
+    var dotsWrap=document.getElementById('dots');
+    var counter=document.getElementById('counter');
+    var bar=document.getElementById('bar');
+    var cur=0, N=slides.length;
 
-  // stagger index per slide
-  slides.forEach(function(s){
-    var items=s.querySelectorAll('[data-anim]');
-    [].forEach.call(items,function(el,i){ el.style.setProperty('--i', i); });
-  });
-
-  // dots
-  slides.forEach(function(s,i){
-    var b=document.createElement('button');
-    b.className='dot'; b.type='button';
-    b.setAttribute('aria-label','Слайд '+(i+1));
-    b.addEventListener('click',function(){ go(i); });
-    dotsWrap.appendChild(b);
-  });
-  var dots=[].slice.call(dotsWrap.children);
-
-  function pad(n){ return (n<10?'0':'')+n; }
-
-  function render(){
-    slides.forEach(function(s,i){
-      s.classList.toggle('active', i===cur);
-      s.classList.toggle('before', i<cur);
-      s.classList.toggle('after', i>cur);
-      s.setAttribute('aria-hidden', i===cur ? 'false':'true');
-      // reset scroll on reveal
-      if(i===cur){ var inner=s.querySelector('.inner'); if(inner) inner.scrollTop=0; }
+    // stagger index per slide
+    slides.forEach(function(s){
+      var items=s.querySelectorAll('[data-anim]');
+      [].forEach.call(items,function(el,i){ el.style.setProperty('--i', String(i)); });
     });
-    dots.forEach(function(d,i){ d.classList.toggle('on', i===cur); });
-    counter.textContent=pad(cur+1)+' / '+pad(N);
-    bar.style.width=((cur+1)/N*100)+'%';
-    // dark chrome on title slide
-    document.body.classList.toggle('on-dark', slides[cur].classList.contains('title-slide'));
+
+    // dots
+    slides.forEach(function(s,i){
+      var b=document.createElement('button');
+      b.className='dot'; b.type='button';
+      b.setAttribute('aria-label','Слайд '+(i+1));
+      b.addEventListener('click',function(){ go(i); });
+      dotsWrap.appendChild(b);
+    });
+    var dots=[].slice.call(dotsWrap.children);
+
+    function pad(n){ return (n<10?'0':'')+n; }
+
+    function render(){
+      slides.forEach(function(s,i){
+        s.classList.toggle('active', i===cur);
+        s.classList.toggle('before', i<cur);
+        s.classList.toggle('after', i>cur);
+        s.setAttribute('aria-hidden', i===cur ? 'false':'true');
+        if(i===cur){ var inner=s.querySelector('.inner'); if(inner) inner.scrollTop=0; }
+      });
+      dots.forEach(function(d,i){ d.classList.toggle('on', i===cur); });
+      counter.textContent=pad(cur+1)+' / '+pad(N);
+      bar.style.width=((cur+1)/N*100)+'%';
+      document.body.classList.toggle('on-dark', slides[cur].classList.contains('title-slide'));
+    }
+
+    function go(i){
+      i=Math.max(0,Math.min(N-1,i));
+      if(i===cur) return;
+      cur=i; render();
+    }
+    function next(){ go(cur+1); }
+    function prev(){ go(cur-1); }
+
+    document.getElementById('next').addEventListener('click',next);
+    document.getElementById('prev').addEventListener('click',prev);
+
+    window.addEventListener('keydown',function(e){
+      var k=e.key;
+      if(k==='ArrowRight'||k==='ArrowDown'||k==='PageDown'||k===' '||k==='Spacebar'){ e.preventDefault(); next(); }
+      else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'){ e.preventDefault(); prev(); }
+      else if(k==='Home'){ e.preventDefault(); go(0); }
+      else if(k==='End'){ e.preventDefault(); go(N-1); }
+      else if(k==='f'||k==='F'){ toggleFs(); }
+    });
+
+    // touch swipe
+    var tx=0,ty=0;
+    deck.addEventListener('touchstart',function(e){ tx=e.changedTouches[0].clientX; ty=e.changedTouches[0].clientY; },{passive:true});
+    deck.addEventListener('touchend',function(e){
+      var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+      if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)){ dx<0?next():prev(); }
+    },{passive:true});
+
+    function toggleFs(){
+      try{
+        if(!document.fullscreenElement && H.requestFullscreen){ H.requestFullscreen(); }
+        else if(document.exitFullscreen){ document.exitFullscreen(); }
+      }catch(_){}
+    }
+    var fsb=document.getElementById('fs'); if(fsb) fsb.addEventListener('click',toggleFs);
+
+    // Show the first slide immediately — NO dependency on requestAnimationFrame
+    // (some mobile/preview contexts throttle rAF, which previously left the deck blank).
+    render();
+  }catch(err){
+    // Anything unexpected -> drop to the fully-readable static layout instead of a blank screen.
+    H.classList.remove('js');
   }
-
-  function go(i){
-    i=Math.max(0,Math.min(N-1,i));
-    if(i===cur) return;
-    cur=i; render();
-  }
-  function next(){ go(cur+1); }
-  function prev(){ go(cur-1); }
-
-  document.getElementById('next').addEventListener('click',next);
-  document.getElementById('prev').addEventListener('click',prev);
-
-  window.addEventListener('keydown',function(e){
-    var k=e.key;
-    if(k==='ArrowRight'||k==='ArrowDown'||k==='PageDown'||k===' '||k==='Spacebar'){ e.preventDefault(); next(); }
-    else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'){ e.preventDefault(); prev(); }
-    else if(k==='Home'){ e.preventDefault(); go(0); }
-    else if(k==='End'){ e.preventDefault(); go(N-1); }
-    else if(k==='f'||k==='F'){ toggleFs(); }
-  });
-
-  // touch swipe
-  var tx=0,ty=0;
-  deck.addEventListener('touchstart',function(e){ tx=e.changedTouches[0].clientX; ty=e.changedTouches[0].clientY; },{passive:true});
-  deck.addEventListener('touchend',function(e){
-    var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
-    if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)){ dx<0?next():prev(); }
-  },{passive:true});
-
-  function toggleFs(){
-    if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||function(){})(); }
-    else { (document.exitFullscreen||function(){})(); }
-  }
-  document.getElementById('fs').addEventListener('click',toggleFs);
-
-  // initial paint -> trigger entrance animation
-  requestAnimationFrame(function(){ requestAnimationFrame(render); });
 })();
 </script>
 </body>
